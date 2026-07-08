@@ -2,7 +2,9 @@
 
 **A private, appointment-only auto detailing service for Metro Vancouver — one vehicle at a time, drop-off only.**
 
-This repository contains the production site for Riflessi Auto Care — built with Next.js 16, TypeScript, and Tailwind CSS v4, deployed on Vercel. It is also **Version 1 of a reusable Automotive Service Website Framework**: a brand-agnostic foundation where the next detailing or service business is a token-and-content swap, not a rebuild. The architecture is ported from and hardened against the [Driftpilot](https://driftpilot.ca) codebase, holding the same performance budget (Lighthouse 95+).
+This repository contains the production site for Riflessi Auto Care — built with Next.js 16, TypeScript, and Tailwind CSS v4, deployed on Vercel. It is also **Version 1 of a reusable Automotive Service Website Framework**: a brand-agnostic foundation where the next detailing or service business is a token-and-content swap, not a rebuild. The architecture is ported from and hardened against the [Driftpilot](https://driftpilot.ca) codebase, built to the same performance budget (static output, minimal client JS, Lighthouse 95+).
+
+**Status:** In active development — the foundation (theme, layout, lead pipeline, homepage) is built and in review; services, pricing, gallery, about, and location pages follow in sequenced pull requests.
 
 ---
 
@@ -19,19 +21,20 @@ Honesty is a hard constraint in the codebase: the operation is never described a
 **Site**
 
 - Design language **"Nero Lucido"** — obsidian black with a champagne-bronze accent, Fraunces display serif over Figtree, and a signature bronze "riflesso" hairline motif
-- A conversion-first homepage: hero, services overview, differentiators with animated stat counters, drop-off process, gallery preview, featured packages, customer experience, FAQ, and CTA band
-- Booking form backed by a React Server Action, validated with Zod, delivered to a lead webhook with retry logic and spam gating (honeypot + time-to-submit)
-- SEO as a first-class concern: per-page metadata via a shared `buildMetadata` helper, `AutoRepair` / `Service` / `FAQPage` / `OfferCatalog` / `BreadcrumbList` JSON-LD, generated `sitemap.xml` and `robots.txt`
+- A conversion-first homepage prerendered at build time: hero, services overview, differentiators with animated stat counters, drop-off process, gallery preview, featured packages, customer experience, FAQ, and CTA band
+- Booking form backed by a React Server Action, validated with Zod, delivered to a lead webhook with retry logic; honeypot + time-to-submit spam checks that never reveal detection, and error-echo so a failed submit never loses what the visitor typed
+- SEO as a first-class concern: per-page metadata via a shared `buildMetadata` helper, JSON-LD from shared builders (`AutoRepair` / `Service` / `FAQPage` / `OfferCatalog` / `BreadcrumbList`), navigation and footer rendered from a single source of truth, generated `sitemap.xml` and `robots.txt`
 - Custom 404 and thank-you pages so no conversion path dead-ends
 - Mobile-first throughout, with a persistent bottom **Book a Detail** bar on small screens
 
 **Engineering**
 
-- Fully static output — every route prerendered at build time, no runtime database
+- Fully static output — every route prerendered at build time, no runtime database, minimal client JS (only the nav, booking form, and the two motion islands ship JavaScript)
 - Strict separation of concerns: routes fetch, components render, content lives behind typed accessor functions
 - Server-only boundaries enforced with the `server-only` package; the webhook target never reaches a client component
 - TypeScript strict mode with domain contracts (`src/types/`) shared across every layer
-- Reduced-motion and no-JS safety baked into the motion layer (scroll reveals, count-up counters)
+- Reduced-motion and no-JS safety baked into the motion layer (scroll reveals, count-up counters) — content is always visible, animation only ever enhances
+- Honesty enforced in code: business claims trace to published facts in `src/lib/content/site.ts`, with a vocabulary rule keeping the copy true to a home-based bay
 - CI-friendly scripts: `lint`, `typecheck` (`next typegen` + `tsc --noEmit`), `build`
 
 ## Technology stack
@@ -40,11 +43,13 @@ Honesty is a hard constraint in the codebase: the operation is never described a
 |---|---|
 | Framework | [Next.js 16](https://nextjs.org) (App Router, React Server Components) |
 | Language | TypeScript (strict) |
-| UI | React 19, Tailwind CSS v4 |
+| UI | React 19, Tailwind CSS v4, semantic design tokens |
 | Type | Fraunces (display) + Figtree (body) via `next/font` |
+| Motion | CSS scroll reveals + count-up counters (reduced-motion safe, no library) |
 | Validation | Zod 4 |
-| Forms | React Server Actions → lead webhook (with retry) |
-| Analytics | Vercel Analytics + Speed Insights |
+| Forms | React Server Actions → lead webhook, retry with graceful degradation |
+| Booking | Form-only — owner confirms each slot manually (single bay, no live scheduler) |
+| Analytics | Vercel Web Analytics + Speed Insights — cookieless, privacy-friendly, zero-config |
 | Hosting | Vercel (static prerender, preview deployments) |
 | Tooling | ESLint 9, PostCSS, `clsx` + `tailwind-merge` |
 
@@ -75,7 +80,7 @@ The three swap layers (documented in [`docs/maintenance/FRAMEWORK.md`](docs/main
 2. **Content** — rewrite the `src/lib/content/*` modules against the fixed `src/types/` shapes. Pages and components don't change.
 3. **Fonts** — swap two `next/font` imports and the `--font-*` tokens.
 
-`src/types/` is the contract that makes this hold: content shapes, form schemas, and component variants are defined once and consumed everywhere.
+`src/types/` is the contract that makes this hold: content shapes, form schemas, and component variants are defined once and consumed everywhere. The framework reuse contract and the local-SEO playbook are documented in [`docs/`](docs/).
 
 ### Local development
 
@@ -97,7 +102,7 @@ Without `BOOKING_WEBHOOK_URL` set, booking submissions are logged to the server 
 
 - `main` auto-deploys to production on Vercel.
 - Every pull request gets a preview URL. Previews are staging — there is no staging branch.
-- Secrets live in Vercel project settings (encrypted), never in the repo. See [.env.example](.env.example) for the full variable inventory.
+- `NEXT_PUBLIC_SITE_URL` is required for production builds — `src/lib/seo.ts` throws without it so a deploy can never ship broken canonical URLs. Secrets live in Vercel project settings (encrypted), never in the repo. See [.env.example](.env.example) for the full variable inventory.
 - **Rollback:** Vercel dashboard → Deployments → ⋯ on a previous deployment → *Promote to Production*. No redeploy or git revert required.
 
 ## Roadmap
@@ -111,7 +116,7 @@ The site ships in sequenced pull requests — one PR at a time, merged after rev
 | **3 — About, Gallery, Legal** | The Riflessi story, before/after gallery, privacy + terms | Planned |
 | **4 — Location pages** | `/locations/[slug]` for New Westminster, Burnaby, Coquitlam, Surrey, Vancouver | Planned |
 
-Deferred (structure reserved): a `/guides` education hub for SEO topic clusters, and real photography swapped in behind the existing `MediaFrame` placeholders — a content change, not a layout one. Off-site local SEO (Google Business Profile, backlinks) is documented in [`docs/seo/LOCAL-SEO.md`](docs/seo/LOCAL-SEO.md).
+Deferred (structure reserved): a `/guides` education hub for SEO topic clusters, real photography swapped in behind the existing `MediaFrame` placeholders (a content change, not a layout one), and the framework's Lighthouse CI budget gate wired into GitHub Actions. Off-site local SEO (Google Business Profile, backlinks) is documented in [`docs/seo/LOCAL-SEO.md`](docs/seo/LOCAL-SEO.md).
 
 ## Version 1 of a reusable framework
 
