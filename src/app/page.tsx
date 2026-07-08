@@ -17,7 +17,7 @@ import { FAQSection } from "@/components/shared/FAQSection";
 import { CTABand } from "@/components/shared/CTABand";
 
 export const metadata: Metadata = buildMetadata({
-  title: `${SITE_NAME} — Car Detailing Studio | Metro Vancouver`,
+  title: `${SITE_NAME} — Car Detailing | Metro Vancouver`,
   description: SITE_DESCRIPTION,
   path: "/",
 });

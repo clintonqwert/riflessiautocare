@@ -9,3 +9,4 @@ node_modules/
 # local session scratch — never committed (builder skill)
 HANDOFF.md
 !.env.example
+.vercel

@@ -1,24 +1,24 @@
 import type { FAQItem } from "@/types/content";
-import { BOOKING_RESPONSE_PROMISE, STUDIO_FACTS } from "@/lib/content/site";
+import { BAY_FACTS, BOOKING_RESPONSE_PROMISE } from "@/lib/content/site";
 
 const homeFaq: FAQItem[] = [
   {
     question: "Where do I drop off my car?",
-    answer: `Riflessi is a private, appointment-only studio in the New Westminster area, serving all of Metro Vancouver. ${STUDIO_FACTS.addressPolicy}`,
+    answer: `Riflessi works from a private home bay in the New Westminster area, serving all of Metro Vancouver. ${BAY_FACTS.addressPolicy}`,
   },
   {
     question: "Why drop-off instead of mobile detailing?",
     answer:
-      "Detailing done in a driveway fights dust, weather, and bad light. In the studio the environment is controlled: paint is polished under inspection lighting, interiors dry properly indoors, and nothing is rushed to beat the rain.",
+      "Time and focus. A mobile job has to fit whatever the day allows and pack up when it's done or not; a drop-off stays in the bay for as long as the work actually needs. Steam, extraction, and machine polishing happen with full equipment on hand, and nothing is rushed to make the next stop.",
   },
   {
     question: "How long will you have my car?",
     answer:
-      "Interior or exterior details are usually same-day: drop off in the morning, pick up in the afternoon. The Signature Full Detail takes six to eight hours, and ceramic coating stays one to two days to cure indoors.",
+      "Interior or exterior details are usually same-day: drop off in the morning, pick up in the afternoon. The Signature Full Detail takes six to eight hours, and ceramic coating stays one to two days so it can cure under cover.",
   },
   {
     question: "How does booking work?",
-    answer: `Send the booking form with your vehicle and preferred day, and you'll get a personal reply ${BOOKING_RESPONSE_PROMISE} to confirm the slot. One vehicle holds the studio at a time, so confirmed bookings are never bumped.`,
+    answer: `Send the booking form with your vehicle and preferred day, and you'll get a personal reply ${BOOKING_RESPONSE_PROMISE} to confirm the slot. One vehicle holds the bay at a time, so confirmed bookings are never bumped.`,
   },
   {
     question: "Are the prices on the site final?",

@@ -27,12 +27,12 @@ export default function ThankYouPage() {
         <div aria-hidden className="riflesso-line mx-auto mt-7 w-28" />
         <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted">
           You&apos;ll get a personal reply {BOOKING_RESPONSE_PROMISE} to confirm
-          your slot and share the studio address. Until then, the bay is being
-          held for one thing: doing your car properly.
+          your slot and share the drop-off address. Until then, the bay is
+          being held for one thing: doing your car properly.
         </p>
         <div className="mt-10">
           <Link href="/" className={buttonClasses({ variant: "secondary", size: "md" })}>
-            Back to the studio
+            Back to Riflessi
           </Link>
         </div>
       </div>

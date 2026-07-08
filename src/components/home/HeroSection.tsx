@@ -5,7 +5,7 @@ import { PRIMARY_CTA } from "@/lib/content/navigation";
 /**
  * Full-height luxury hero — obsidian surface, bronze glow, Fraunces display.
  * LCP element (h1) animates transform-only via riseIn so paint is never
- * delayed.
+ * delayed. Vocabulary: never "studio" — see src/lib/content/site.ts.
  */
 export function HeroSection() {
   return (
@@ -21,7 +21,7 @@ export function HeroSection() {
           <p
             className="mb-5 text-[13px] font-semibold uppercase tracking-[0.16em] text-accent motion-safe:animate-[fadeUp_0.5s_ease-out_both]"
           >
-            Private Detailing Studio · Metro Vancouver
+            Detailing by Appointment · Metro Vancouver
           </p>
           <h1 className="text-display-sm font-medium tracking-tight text-fg text-balance md:text-display lg:text-display-lg motion-safe:animate-[riseIn_0.5s_ease-out_both]">
             One vehicle.
@@ -32,8 +32,8 @@ export function HeroSection() {
             className="mt-7 max-w-xl text-lg leading-relaxed text-muted md:text-xl motion-safe:animate-[fadeUp_0.5s_ease-out_both]"
             style={{ animationDelay: "160ms" }}
           >
-            Riflessi is an appointment-only detailing studio. Drop off your
-            car and it gets a dedicated bay, proper lighting, and one
+            Riflessi is a private, appointment-only detailing service. Drop
+            off your car and it gets the bay to itself and one
             craftsman&apos;s full attention — until the finish is right.
           </p>
           <div

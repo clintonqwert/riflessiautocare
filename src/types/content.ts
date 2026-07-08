@@ -51,7 +51,7 @@ export interface PricingPackage {
   tagline: string;
   /** Exact CAD price per vehicle-size tier */
   prices: Record<VehicleSize, number>;
-  /** Rough time in the studio, e.g. "4–6 hours" */
+  /** Rough hands-on time, e.g. "4–6 hours" */
   duration: string;
   features: string[];
   /** The anchor package highlighted on home + pricing */

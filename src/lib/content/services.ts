@@ -6,7 +6,7 @@ const services: DetailService[] = [
     name: "Interior Detail",
     title: "Interior Car Detailing in Metro Vancouver — Riflessi Auto Care",
     description:
-      "Deep interior detailing at a private drop-off studio in Metro Vancouver. Steam, extraction, leather care — one vehicle at a time.",
+      "Deep interior detailing by private drop-off in Metro Vancouver. Steam, extraction, leather care — one vehicle at a time.",
     excerpt: "Every surface inside the cabin, reset to clean.",
     outcome:
       "Step into a cabin that feels like delivery day — deep-cleaned, conditioned, and free of the life that accumulates in a daily driver.",
@@ -14,7 +14,7 @@ const services: DetailService[] = [
     benefits: [
       "Steam and hot-water extraction, not just a vacuum pass",
       "Leather cleaned and conditioned so it lasts, not just shines",
-      "Indoor studio: the interior dries properly before pickup",
+      "The interior gets time to dry fully before pickup — no damp seats",
     ],
     included: [
       "Full vacuum including seat rails, vents, and trunk",
@@ -29,7 +29,7 @@ const services: DetailService[] = [
       {
         question: "How long does an interior detail take?",
         answer:
-          "Most interiors take three to five hours depending on size and condition. Because the studio takes one vehicle at a time, your car isn't rushed to make room for the next one — it's ready when it's right.",
+          "Most interiors take three to five hours depending on size and condition. Because only one vehicle is taken at a time, your car isn't rushed to make room for the next one — it's ready when it's right.",
       },
       {
         question: "Can you remove pet hair and odors?",
@@ -39,7 +39,7 @@ const services: DetailService[] = [
       {
         question: "Will my seats be wet at pickup?",
         answer:
-          "No. Extraction pulls most of the moisture out, and the vehicle dries indoors in the studio before you pick it up.",
+          "No. Extraction pulls most of the moisture out, and the interior gets proper drying time before you pick the car up.",
       },
     ],
   },
@@ -48,15 +48,15 @@ const services: DetailService[] = [
     name: "Exterior Detail",
     title: "Exterior Car Detailing in Metro Vancouver — Riflessi Auto Care",
     description:
-      "Hand wash, clay bar, machine polish, and paint protection at a private drop-off studio in Metro Vancouver.",
+      "Hand wash, clay bar, machine polish, and paint protection by private drop-off in Metro Vancouver.",
     excerpt: "Paint decontaminated, polished, and protected by hand.",
     outcome:
-      "Paint that reflects like glass — washed, decontaminated, and machine-polished under proper lighting, never run through a tunnel.",
+      "Paint that reflects like glass — washed, decontaminated, and machine-polished by hand, never run through a tunnel.",
     primaryKeyword: "exterior car detailing",
     benefits: [
       "Two-bucket hand wash — no brushes, no swirl-inducing shortcuts",
       "Clay bar decontamination before any polish touches the paint",
-      "Finished indoors under inspection lighting, not in a driveway",
+      "Finish checked in natural daylight — where swirls actually show",
     ],
     included: [
       "Pre-rinse and foam bath, two-bucket hand wash",
@@ -76,7 +76,7 @@ const services: DetailService[] = [
       {
         question: "Why is drop-off better than a mobile wash for exterior work?",
         answer:
-          "Polishing outdoors means dust settling on the panel while you work and sun flashing the products. In the studio the light is controlled, the panel is clean, and the finish can be inspected properly before the car leaves.",
+          "Time. A mobile setup races pack-up time and whatever daylight is left; a drop-off stays as long as the paint needs. Machine polishing can't be hurried, and the finish gets checked in direct daylight — the harshest judge there is — before the car goes home.",
       },
       {
         question: "How long does the protection last?",
@@ -90,7 +90,7 @@ const services: DetailService[] = [
     name: "Signature Full Detail",
     title: "Full Car Detailing in Metro Vancouver — Riflessi Auto Care",
     description:
-      "The complete Riflessi treatment: full interior and exterior detail in one studio visit. Drop off in the morning, drive home reset.",
+      "The complete Riflessi treatment: full interior and exterior detail in one visit. Drop off in the morning, drive home reset.",
     excerpt: "The complete treatment — inside and out, in one visit.",
     outcome:
       "One drop-off, everything done: the full interior reset and the full exterior treatment, sequenced properly so neither compromises the other.",
@@ -114,6 +114,11 @@ const services: DetailService[] = [
           "Usually. Most full details take six to eight hours, so morning drop-off and end-of-day pickup is the normal rhythm. You'll get a message when the car is ready.",
       },
       {
+        question: "Do I need to stick around?",
+        answer:
+          "No — that's the point of drop-off. Leave the car, get on with your day, and come back when it's done. The bay is reserved for your vehicle until pickup.",
+      },
+      {
         question: "Why book this instead of separate interior and exterior visits?",
         answer:
           "One visit costs less than two separate bookings, and the work sequences better — soaking and extraction happen while exterior products cure, and the final inspection covers the whole car at once.",
@@ -125,22 +130,22 @@ const services: DetailService[] = [
     name: "Ceramic Coating",
     title: "Ceramic Coating in Metro Vancouver — Riflessi Auto Care",
     description:
-      "Professional ceramic coating with full paint prep at a private Metro Vancouver studio. Years of protection, applied without shortcuts.",
+      "Professional ceramic coating with full paint prep, by private drop-off in Metro Vancouver. Years of protection, applied without shortcuts.",
     excerpt: "Years of protection, bonded to properly prepped paint.",
     outcome:
       "Protection measured in years, not months — a ceramic layer bonded to paint that was decontaminated and polished first, because coating over defects just seals them in.",
     primaryKeyword: "ceramic coating",
     benefits: [
       "Full decontamination and machine polish before coating — always",
-      "Applied and cured indoors, away from dust and weather",
+      "Coating cures under cover in the garage before release",
       "Water and grime rinse off instead of bonding to the paint",
     ],
     included: [
       "Full exterior decontamination wash and clay bar",
       "Machine polish to correct light defects before coating",
       "Panel wipe to strip oils so the coating bonds properly",
-      "Ceramic coating applied panel by panel under inspection light",
-      "Indoor cure time before the car goes back outside",
+      "Ceramic coating applied and checked panel by panel",
+      "Cure time under cover before the car goes back on the road",
       "Aftercare guidance — how to wash it, what to avoid, and when",
     ],
     pairsWith: ["full-detail", "interior-detailing"],

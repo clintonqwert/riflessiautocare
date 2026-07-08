@@ -61,7 +61,7 @@ export function IconSteeringWheel(props: IconProps) {
   );
 }
 
-/** Clock — turnaround / studio time. */
+/** Clock — turnaround / hands-on time. */
 export function IconClock(props: IconProps) {
   return (
     <svg {...base(props)}>

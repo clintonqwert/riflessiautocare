@@ -32,8 +32,8 @@ export const SERVICES_COLUMN: { heading: string; links: NavLink[] } = {
   links: [...SERVICES_NAV, { label: "Packages & Pricing", href: "/pricing" }],
 };
 
-export const STUDIO_COLUMN: { heading: string; links: NavLink[] } = {
-  heading: "Studio",
+export const EXPLORE_COLUMN: { heading: string; links: NavLink[] } = {
+  heading: "Explore",
   links: [
     { label: "About", href: "/about" },
     { label: "Gallery", href: "/gallery" },

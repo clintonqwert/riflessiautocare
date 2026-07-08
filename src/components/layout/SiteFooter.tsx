@@ -2,11 +2,11 @@ import Link from "next/link";
 import { buttonClasses } from "@/components/ui/button";
 import {
   SERVICES_COLUMN,
-  STUDIO_COLUMN,
+  EXPLORE_COLUMN,
   LEGAL_LINKS,
   PRIMARY_CTA,
 } from "@/lib/content/navigation";
-import { CONTACT_EMAIL, SERVICE_CITIES, STUDIO_FACTS } from "@/lib/content/site";
+import { BAY_FACTS, CONTACT_EMAIL, SERVICE_CITIES } from "@/lib/content/site";
 
 function FooterColumn({
   heading,
@@ -53,7 +53,7 @@ export function SiteFooter() {
               </span>
             </Link>
             <p className="mt-3 text-sm leading-relaxed text-muted">
-              {STUDIO_FACTS.model} serving {STUDIO_FACTS.areaServed}.
+              {BAY_FACTS.model} serving {BAY_FACTS.areaServed}.
             </p>
             <p className="mt-4 text-xs leading-relaxed text-muted">
               Serving {SERVICE_CITIES.join(" · ")}
@@ -67,11 +67,11 @@ export function SiteFooter() {
             ariaLabel="Footer services navigation"
           />
 
-          {/* Col 3 — Studio */}
+          {/* Col 3 — Explore */}
           <FooterColumn
-            heading={STUDIO_COLUMN.heading}
-            links={STUDIO_COLUMN.links}
-            ariaLabel="Footer studio navigation"
+            heading={EXPLORE_COLUMN.heading}
+            links={EXPLORE_COLUMN.links}
+            ariaLabel="Footer explore navigation"
           />
 
           {/* Col 4 — Book */}

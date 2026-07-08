@@ -30,8 +30,8 @@ Target cities: **New Westminster · Burnaby · Coquitlam · Surrey · Vancouver*
 
 1. Create GBP as category **Car detailing service**, set up as a
    **service-area business**: hide the home address, list the five cities as
-   the service area. This is the correct, policy-safe setup for a home
-   studio.
+   the service area. This is the correct, policy-safe setup for a home-based
+   bay.
 2. NAP consistency: use the exact same business name, phone, and site URL
    everywhere (GBP, site footer, directories).
 3. Post weekly: one photo of completed work (before/after pairs perform
@@ -46,7 +46,7 @@ Target cities: **New Westminster · Burnaby · Coquitlam · Surrey · Vancouver*
 1. Local directories: Google, Bing Places, Apple Business Connect, Yelp,
    YellowPages.ca, 411.ca.
 2. Detailing-product brands' "find an installer/detailer" directories for
-   any products used in the studio (coating brands especially).
+   any products used in the work (coating brands especially).
 3. Community: r/vancouver and BC car-club forums (genuine participation,
    not link drops), local Facebook groups for the five cities.
 4. Partnerships: tint shops, PPF installers, independent mechanics, and

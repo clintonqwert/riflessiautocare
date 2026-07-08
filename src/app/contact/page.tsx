@@ -4,12 +4,12 @@ import { PageHero } from "@/components/shared/PageHero";
 import { BookingForm } from "@/components/forms/BookingForm";
 import { Card } from "@/components/ui/Card";
 import { IconKey, IconMapPin, IconClock } from "@/components/ui/icons";
-import { BOOKING_RESPONSE_PROMISE, STUDIO_FACTS } from "@/lib/content/site";
+import { BAY_FACTS, BOOKING_RESPONSE_PROMISE } from "@/lib/content/site";
 
 export const metadata: Metadata = buildMetadata({
   title: `Book a Detail — ${SITE_NAME} | Metro Vancouver`,
   description:
-    "Book a drop-off detailing appointment at Riflessi's private Metro Vancouver studio. Pick a service and a day — you'll get a personal reply within one business day.",
+    "Book a drop-off detailing appointment with Riflessi in Metro Vancouver. Pick a service and a day — you'll get a personal reply within one business day.",
   path: "/contact",
 });
 
@@ -22,7 +22,7 @@ const HOW_IT_WORKS = [
   {
     icon: IconMapPin,
     title: "Get the address",
-    body: STUDIO_FACTS.addressPolicy,
+    body: BAY_FACTS.addressPolicy,
   },
   {
     icon: IconKey,
@@ -37,7 +37,7 @@ export default function ContactPage() {
       <PageHero
         eyebrow="Prenota"
         heading="Book your detail."
-        subheading="One vehicle holds the studio at a time — pick your service and a preferred day, and the bay is yours."
+        subheading="One vehicle at a time — pick your service and a preferred day, and the bay is yours."
       />
       <section className="bg-surface pb-24 md:pb-32">
         <div className="mx-auto max-w-container px-5 md:px-8">

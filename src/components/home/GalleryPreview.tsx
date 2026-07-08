@@ -11,7 +11,7 @@ export function GalleryPreview({ items }: { items: GalleryItem[] }) {
           id="gallery-heading"
           eyebrow="Il Lavoro"
           heading="Every detail is documented."
-          lede="Before-and-after photos of studio work land here as vehicles roll out — judged in the same light they were finished in."
+          lede="Before-and-after photos land here as vehicles roll out — judged in the same daylight they were finished in."
         />
         <div className="mt-12 grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-6">
           {items.slice(0, 3).map((item, i) => (

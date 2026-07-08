@@ -39,7 +39,7 @@ const packages: PricingPackage[] = [
     features: [
       "Everything in the Interior Detail",
       "Everything in the Exterior Detail",
-      "Sequenced properly in one studio day",
+      "Sequenced properly in one dedicated day",
       "Final walkthrough at pickup",
     ],
     featured: true,
@@ -49,11 +49,11 @@ const packages: PricingPackage[] = [
     name: "Ceramic Coating",
     tagline: "Years of protection, prep included.",
     prices: { "coupe-sedan": 899, "suv-crossover": 999, "truck-van": 1099 },
-    duration: "1–2 studio days",
+    duration: "1–2 days",
     features: [
       "Full decontamination and clay bar",
       "Machine polish before coating",
-      "Ceramic coating, cured indoors",
+      "Ceramic coating, cured under cover",
       "Aftercare guidance included",
     ],
   },

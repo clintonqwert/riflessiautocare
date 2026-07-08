@@ -4,7 +4,7 @@ const steps: ProcessStep[] = [
   {
     title: "Book your slot",
     description:
-      "Pick a service and a drop-off day. Because the studio takes one vehicle at a time, your booking is a reservation, not a queue number.",
+      "Pick a service and a drop-off day. Only one vehicle is taken at a time, so your booking is a reservation, not a queue number.",
   },
   {
     title: "Drop off",
@@ -14,7 +14,7 @@ const steps: ProcessStep[] = [
   {
     title: "The work",
     description:
-      "Your car gets the studio to itself — proper lighting, controlled environment, and no clock pushing the next vehicle in.",
+      "Your car gets the bay to itself for as long as the work takes — no clock pushing the next vehicle in.",
   },
   {
     title: "Reveal & pickup",

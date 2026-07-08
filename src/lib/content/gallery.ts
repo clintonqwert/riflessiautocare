@@ -27,7 +27,7 @@ const items: GalleryItem[] = [
     slug: "coupe-ceramic",
     vehicle: "Weekend coupe",
     service: "ceramic-coating",
-    summary: "Full prep and ceramic coating, cured in the studio.",
+    summary: "Full prep and ceramic coating, cured under cover.",
     beforeAlt: "Coupe paint before decontamination and coating",
     afterAlt: "Coupe with a deep gloss after ceramic coating",
   },

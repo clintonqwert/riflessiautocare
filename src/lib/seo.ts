@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import type { DetailService, FAQItem, PricingPackage } from "@/types/content";
 import {
+  BAY_FACTS,
   BUSINESS_NAME,
   CONTACT_EMAIL,
   SERVICE_CITIES,
-  STUDIO_FACTS,
 } from "@/lib/content/site";
 import { VEHICLE_SIZE_LABELS, VEHICLE_SIZES } from "@/types/content";
 
@@ -20,7 +20,7 @@ export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ?? _siteUrlFallback
 ).replace(/\/$/, "");
 export const SITE_DESCRIPTION =
-  "Private, appointment-only auto detailing studio serving Metro Vancouver. Drop-off only — one vehicle at a time, detailed until the finish is right.";
+  "Private, appointment-only auto detailing serving Metro Vancouver. Drop-off only — one vehicle at a time, detailed until the finish is right.";
 
 interface BuildMetadataInput {
   /** Full title, e.g. "Interior Detailing in Metro Vancouver — Riflessi Auto Care" */
@@ -77,7 +77,7 @@ const businessRef = {
  * Site-wide LocalBusiness node (rendered once in the root layout).
  * `AutoRepair` is schema.org's closest AutomotiveBusiness subtype with wide
  * search support; detailing is expressed through the Service nodes.
- * Address is deliberately omitted — service-area business (home studio).
+ * Address is deliberately omitted — service-area business (home bay).
  */
 export function localBusinessSchema() {
   return {
@@ -100,7 +100,7 @@ export function localBusinessSchema() {
     additionalProperty: {
       "@type": "PropertyValue",
       name: "Service model",
-      value: `${STUDIO_FACTS.model}. ${STUDIO_FACTS.intake}.`,
+      value: `${BAY_FACTS.model}. ${BAY_FACTS.intake}.`,
     },
   };
 }
@@ -124,7 +124,7 @@ export function serviceSchema(service: DetailService) {
     description: service.description,
     url: `${SITE_URL}/services/${service.slug}`,
     provider: businessRef,
-    areaServed: STUDIO_FACTS.areaServed,
+    areaServed: BAY_FACTS.areaServed,
   };
 }
 

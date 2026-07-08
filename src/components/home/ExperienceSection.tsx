@@ -10,7 +10,7 @@ const MOMENTS = [
   {
     icon: IconKey,
     title: "The handover",
-    body: "Morning drop-off, a walk around the car together, and a clear agreement on exactly what's being done. Then the studio is your car's for the day.",
+    body: "Morning drop-off, a walk around the car together, and a clear agreement on exactly what's being done. Then the bay is your car's for the day.",
   },
   {
     icon: IconClock,
@@ -20,7 +20,7 @@ const MOMENTS = [
   {
     icon: IconSparkle,
     title: "The reveal",
-    body: "Pickup ends with a walkthrough under the studio lights, panel by panel, so you see what was done before you drive home in it.",
+    body: "Pickup ends with a walkthrough in daylight, panel by panel, so you see exactly what was done before you drive home in it.",
   },
 ];
 

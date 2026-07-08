@@ -5,14 +5,14 @@ import type { Stat } from "@/types/content";
 
 const REASONS = [
   {
-    title: "A controlled environment, not a driveway",
-    body: "Mobile detailing fights dust, weather, and whatever light the day offers. In the studio, paint is polished under inspection lighting and interiors dry properly indoors — the conditions the work deserves.",
-    media: { alt: "The Riflessi studio bay under inspection lighting", label: "The studio" },
+    title: "A small bay with big standards",
+    body: "This isn't a glass showroom with a waiting room — it's one bay, a small garage, and the right equipment. Every dollar and every hour goes into the car in front of me, not the overhead around it. The finish is judged in natural daylight, the harshest light there is.",
+    media: { alt: "The Riflessi detailing bay", label: "The bay" },
   },
   {
-    title: "One car holds the studio",
+    title: "One car holds the bay",
     body: "There is no row of vehicles waiting behind yours. A booking reserves the whole bay for the whole visit, so nothing is rushed to make room for the next job.",
-    media: { alt: "A single vehicle in the Riflessi studio bay", label: "One at a time" },
+    media: { alt: "A single vehicle in the Riflessi bay", label: "One at a time" },
   },
   {
     title: "You know exactly who did the work",

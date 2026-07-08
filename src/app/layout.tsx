@@ -26,7 +26,7 @@ const figtree = Figtree({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} — Car Detailing Studio | Metro Vancouver`,
+    default: `${SITE_NAME} — Car Detailing | Metro Vancouver`,
     template: `%s — ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,

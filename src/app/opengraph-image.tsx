@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { SITE_NAME } from "@/lib/seo";
 import { NERO } from "@/lib/design-tokens";
 
-export const alt = `${SITE_NAME} — Car Detailing Studio, Metro Vancouver`;
+export const alt = `${SITE_NAME} — Car Detailing, Metro Vancouver`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -76,7 +76,7 @@ export default function Image() {
             display: "flex",
           }}
         >
-          Private, appointment-only detailing studio · Metro Vancouver
+          Private, appointment-only detailing · Metro Vancouver
         </div>
 
         {/* Bottom badge */}
