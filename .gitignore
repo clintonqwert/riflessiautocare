@@ -1,6 +1,12 @@
 node_modules/
 .next/
+*.tsbuildinfo
 .env*
 .DS_Store
 .claude/worktrees/
 .vscode
+.devswarm-temp/
+# local session scratch — never committed (builder skill)
+HANDOFF.md
+!.env.example
+.vercel
