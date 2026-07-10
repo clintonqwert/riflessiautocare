@@ -10,11 +10,25 @@ export interface FAQItem {
   answer: string;
 }
 
-export type ServiceSlug =
-  | "interior-detailing"
-  | "exterior-detailing"
-  | "full-detail"
-  | "ceramic-coating";
+export const SERVICE_SLUGS = [
+  "interior-detailing",
+  "exterior-detailing",
+  "full-detail",
+  "ceramic-coating",
+] as const;
+export type ServiceSlug = (typeof SERVICE_SLUGS)[number];
+
+/**
+ * Canonical human-facing service names. services.ts, navigation.ts, and the
+ * booking form all derive from this map — rename a service here, and every
+ * surface updates together.
+ */
+export const SERVICE_LABELS: Record<ServiceSlug, string> = {
+  "interior-detailing": "Interior Detail",
+  "exterior-detailing": "Exterior Detail",
+  "full-detail": "Signature Full Detail",
+  "ceramic-coating": "Ceramic Coating",
+};
 
 export interface DetailService {
   slug: ServiceSlug;

@@ -3,6 +3,10 @@
  * path, for the places Tailwind classes can't reach: next/og inline styles
  * (opengraph-image.tsx). Components must use the semantic tokens in
  * globals.css instead.
+ *
+ * MIRROR: these hex values duplicate the `@theme` block in
+ * src/app/globals.css. Change a hex there → change it here in the same
+ * commit, or the OG image drifts from the site palette.
  */
 export const NERO = {
   surface: "#0a0a0b",

@@ -1,6 +1,10 @@
 @import "tailwindcss";
 
 @theme {
+  /* MIRROR: the nine core hex values below are duplicated in
+     src/lib/design-tokens.ts (NERO) for next/og, which can't read CSS vars.
+     Change a hex here → change it there in the same commit. */
+
   /* ── Nero Lucido surfaces — obsidian, like fresh ceramic-coated paint ── */
   --color-surface: #0a0a0b;
   --color-raised: #121214;
