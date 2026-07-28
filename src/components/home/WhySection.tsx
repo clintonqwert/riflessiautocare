@@ -7,17 +7,29 @@ const REASONS = [
   {
     title: "A small bay with big standards",
     body: "This isn't a glass showroom with a waiting room — it's one bay, a small garage, and the right equipment. Every dollar and every hour goes into the car in front of me, not the overhead around it. The finish is judged in natural daylight, the harshest light there is.",
-    media: { alt: "The Riflessi detailing bay", label: "The bay" },
+    media: {
+      alt: "The Riflessi detailing bay",
+      label: "The bay",
+      src: "/images/why-bay.jpg",
+    },
   },
   {
     title: "One car holds the bay",
     body: "There is no row of vehicles waiting behind yours. A booking reserves the whole bay for the whole visit, so nothing is rushed to make room for the next job.",
-    media: { alt: "A single vehicle in the Riflessi bay", label: "One at a time" },
+    media: {
+      alt: "A single vehicle in the Riflessi bay",
+      label: "One at a time",
+      src: "/images/why-single-vehicle.jpg",
+    },
   },
   {
     title: "You know exactly who did the work",
     body: "No rotating crew, no handoffs. The person you meet at drop-off is the person who details your car and walks you around it at pickup — accountability you can shake hands with.",
-    media: { alt: "Final walkthrough at vehicle pickup", label: "The craftsman" },
+    media: {
+      alt: "Final walkthrough at vehicle pickup",
+      label: "The craftsman",
+      src: "/images/why-craftsman.jpg",
+    },
   },
 ];
 
@@ -48,9 +60,11 @@ export function WhySection({ stats }: { stats: Stat[] }) {
                 </p>
               </div>
               <MediaFrame
+                src={reason.media.src}
                 alt={reason.media.alt}
                 label={reason.media.label}
                 ratio="4/3"
+                sizes="(min-width: 768px) 50vw, 100vw"
                 className={i % 2 === 1 ? "md:order-1" : undefined}
               />
             </div>

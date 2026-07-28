@@ -15,13 +15,16 @@ export interface AboutPassage {
     alt: string;
     label: string;
     /**
-     * Real photo path under /public. Absent -> MediaFrame renders its gradient
-     * placeholder. Only frames that depict nothing specific about this
-     * business may hold a licensed stock photo; the bay and the owner wait for
-     * genuine photography.
+     * Photo path under /public. Absent -> MediaFrame renders its gradient
+     * placeholder.
+     *
+     * TEMPORARY: these currently point at licensed stock standing in for
+     * photography that has not been shot yet. Replace the files in place —
+     * the paths are stable, so swapping in real photography needs no code
+     * change. See docs/maintenance/IMAGE-CREDITS.md.
      */
     src?: string;
-    /** Required whenever `src` is a licensed photo. */
+    /** Shown under the frame. Set for stock; drop it when real photos land. */
     credit?: PhotoCredit;
   };
 }
@@ -38,9 +41,6 @@ const passages: AboutPassage[] = [
       "It is the only test that matters here. When the work is finished, the paint should hand back a clean picture of whatever is standing in front of it — no haze softening the edges, no swirls breaking up the light.",
       "That standard is the reason this operation is shaped the way it is. Paint that reflects properly needs hours, honest light, and someone who has nowhere else to be that afternoon.",
     ],
-    // Abstract paint surface — claims nothing about this bay or its work, so a
-    // licensed photo is honest here. Every other frame on the site waits for
-    // genuine photography.
     media: {
       alt: "A reflection held in the compound curve of freshly polished paint",
       label: "The standard",
@@ -61,7 +61,11 @@ const passages: AboutPassage[] = [
       "Working in the open sounds like a compromise until you watch it catch things. Natural daylight is harsher than any shop lighting — it shows the swirl you would have missed and the panel you thought was finished. Work that passes outdoors passes anywhere.",
       "The garage covers what daylight cannot. Ceramic coatings cure under cover, out of the weather, before the car goes back on the road.",
     ],
-    media: { alt: "The Riflessi outdoor detailing bay", label: "The bay" },
+    media: {
+      alt: "The Riflessi outdoor detailing bay",
+      label: "The bay",
+      src: "/images/about-bay.jpg",
+    },
   },
   {
     heading: "The same hands, start to finish.",
@@ -69,7 +73,11 @@ const passages: AboutPassage[] = [
       "Drop-off, the work itself, and the walkthrough at pickup are all one person. There is no crew to hand your car down to and no shift change partway through a polish.",
       "It makes accountability simple. If something on your car was missed, there is exactly one person to ask about it, and you already met them.",
     ],
-    media: { alt: "Final walkthrough with the owner at pickup", label: "One craftsman" },
+    media: {
+      alt: "Final walkthrough with the owner at pickup",
+      label: "One craftsman",
+      src: "/images/about-craft.jpg",
+    },
   },
 ];
 

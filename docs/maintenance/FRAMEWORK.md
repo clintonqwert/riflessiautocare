@@ -33,16 +33,18 @@ framework and should survive re-branding untouched.
    click-to-load facade.
 7. Business claims in copy must trace to `src/lib/content/site.ts` or a
    content module (the no-invention rule).
-8. **The no-invention rule covers imagery too.** A frame may hold a licensed
-   stock photo only if it depicts nothing specific about this business.
-   Anything showing the bay, the owner, or a customer's vehicle waits for
-   genuine photography — a stock before/after is a manufactured portfolio, and
-   `/gallery` says so in its own copy. Licensed photos carry a `PhotoCredit`;
+8. **Imagery carries the same burden as copy.** A stock photo is safe where it
+   depicts nothing specific about the business. Where a frame stands for the
+   bay, the owner, or a customer's vehicle, only genuine photography can make
+   the claim it implies. Licensed photos carry a `PhotoCredit`;
    `components/shared/PhotoCredit.tsx` holds the attribution and UTM rules so
    compliance is structural rather than remembered.
 
-   Current status: 1 of 12 frames holds a real photo (the abstract paint
-   surface on `/about`). The other 11 are honest gradient placeholders.
+   **Current status (owner decision, 2026-07-28): all 12 frames hold temporary
+   stock**, so the layout can be reviewed with real photographs in it. Real
+   assets land in a following PR. The paths are stable and semantic — replacing
+   the files needs no code change. Full inventory, and the caveats that apply
+   while this holds, live in `docs/maintenance/IMAGE-CREDITS.md`.
 
 ## Riflessi-specific additions (part of the framework going forward)
 
