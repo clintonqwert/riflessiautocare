@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "unsplash": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/Users/clintonjayr/.claude/mcp-servers/unsplash-smart/node_modules/@drumnation/unsplash-smart-mcp-server/dist/server.js"
+      ],
+      "env": {
+        "UNSPLASH_ACCESS_KEY": "${UNSPLASH_ACCESS_KEY}"
+      }
+    }
+  }
+}
