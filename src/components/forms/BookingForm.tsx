@@ -3,8 +3,14 @@
 import { useActionState, useEffect, useRef } from "react";
 import { submitBooking } from "@/lib/actions/submit-booking";
 import { SERVICE_OPTIONS, VEHICLE_SIZES } from "@/types/forms";
-import type { FormResult } from "@/types/forms";
-import { SERVICE_LABELS, VEHICLE_SIZE_LABELS } from "@/types/content";
+import type { BookingFormValues, FormResult } from "@/types/forms";
+import {
+  SERVICE_LABELS,
+  VEHICLE_SIZE_LABELS,
+  type ServiceSlug,
+  type VehicleSize,
+} from "@/types/content";
+import { CONTACT_EMAIL } from "@/lib/content/site";
 import { inputBase, inputError, labelBase, errorBanner, errorText } from "@/components/ui/field";
 import { buttonClasses } from "@/components/ui/button";
 
@@ -15,6 +21,28 @@ function FieldError({ id, message }: { id: string; message?: string }) {
       {message}
     </p>
   );
+}
+
+/**
+ * Escape hatch for a lead the server could not hand off. The visitor's own
+ * answers are pre-written into the email so recovering the booking costs
+ * them one tap, not a retype.
+ */
+function fallbackMailto(values: BookingFormValues | undefined): string {
+  const lines = [
+    `Name: ${values?.name ?? ""}`,
+    `Phone: ${values?.phone ?? ""}`,
+    `Vehicle: ${values?.vehicle ?? ""}`,
+    `Service: ${values?.service ? SERVICE_LABELS[values.service as ServiceSlug] ?? values.service : ""}`,
+    `Vehicle size: ${values?.vehicleSize ? VEHICLE_SIZE_LABELS[values.vehicleSize as VehicleSize] ?? values.vehicleSize : ""}`,
+    `Preferred drop-off day: ${values?.preferredDate ?? ""}`,
+    `Notes: ${values?.notes ?? ""}`,
+  ];
+  const query = new URLSearchParams({
+    subject: "Booking request",
+    body: `${lines.join("\n")}\n`,
+  });
+  return `mailto:${CONTACT_EMAIL}?${query.toString()}`;
 }
 
 export function BookingForm() {
@@ -211,10 +239,21 @@ export function BookingForm() {
         />
       </div>
 
+      {/* Only a failed hand-off sets `errors.form`, so the fallback always applies. */}
       {errors.form && (
-        <p role="alert" className={errorBanner}>
-          {errors.form}
-        </p>
+        <div role="alert" className={errorBanner}>
+          <p>{errors.form}</p>
+          <p className="mt-2">
+            Send these details straight to{" "}
+            <a
+              href={fallbackMailto(values)}
+              className="font-semibold underline underline-offset-2 hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger"
+            >
+              {CONTACT_EMAIL}
+            </a>{" "}
+            and your request still gets seen — your answers are already filled in.
+          </p>
+        </div>
       )}
 
       <button

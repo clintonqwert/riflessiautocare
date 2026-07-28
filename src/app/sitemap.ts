@@ -4,9 +4,11 @@ import { getAllServices } from "@/lib/content/services";
 
 /**
  * Only live routes are listed. As later PRs land pages, add them here:
- *   /about, /gallery, /privacy, /terms                  — PR #3
  *   /locations/[slug] (from locations.ts)               — PR #4
  *   /guides + /guides/[slug]                            — phase 2 blog hub
+ *
+ * /thank-you stays out deliberately: it is noindex, and listing a noindex
+ * URL in the sitemap sends search engines contradictory signals.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
   const entry = (
@@ -25,5 +27,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
       entry(`/services/${service.slug}`, 0.9),
     ),
     entry("/pricing", 0.9),
+    entry("/gallery", 0.7),
+    entry("/about", 0.7),
+    entry("/privacy", 0.3),
+    entry("/terms", 0.3),
   ];
 }
