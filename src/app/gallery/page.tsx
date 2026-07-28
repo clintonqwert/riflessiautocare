@@ -17,10 +17,6 @@ export const metadata: Metadata = buildMetadata({
 
 export default function GalleryPage() {
   const items = getGalleryItems();
-  // The note below disappears on its own once real photo paths land in gallery.ts.
-  const awaitingPhotography = items.every(
-    (item) => !item.beforeSrc && !item.afterSrc,
-  );
 
   return (
     <>
@@ -38,17 +34,6 @@ export default function GalleryPage() {
 
       <section className="bg-surface pb-24 md:pb-32" aria-label="Before and after work">
         <div className="mx-auto max-w-container px-5 md:px-8">
-          {awaitingPhotography && (
-            <p
-              className="mb-12 max-w-2xl rounded-md border border-line bg-raised px-5 py-4 text-sm leading-relaxed text-muted"
-              data-reveal
-            >
-              Riflessi is newly opened, so these frames are placeholders rather
-              than stock photos of someone else&apos;s work. Each pair is filled
-              in with the real vehicle as it rolls out of the bay.
-            </p>
-          )}
-
           <div className="grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-x-6 md:gap-y-16">
             {items.map((item, i) => (
               <div

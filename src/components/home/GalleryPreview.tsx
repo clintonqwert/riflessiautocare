@@ -16,7 +16,8 @@ export function GalleryPreview({ items }: { items: GalleryItem[] }) {
         <div className="mt-12 grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-6">
           {items.slice(0, 3).map((item, i) => (
             <div key={item.slug} data-reveal style={{ "--reveal-i": i } as React.CSSProperties}>
-              <BeforeAfterPair item={item} />
+              {/* Three pairs across on desktop, so each frame is ~1/6 of the row. */}
+              <BeforeAfterPair item={item} sizes="(min-width: 768px) 17vw, 50vw" />
             </div>
           ))}
         </div>

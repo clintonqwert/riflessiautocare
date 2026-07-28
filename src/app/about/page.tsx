@@ -7,6 +7,7 @@ import { PageHero } from "@/components/shared/PageHero";
 import { JsonLd } from "@/components/shared/JsonLd";
 import { CTABand } from "@/components/shared/CTABand";
 import { MediaFrame } from "@/components/shared/MediaFrame";
+import { PhotoCredit } from "@/components/shared/PhotoCredit";
 import { StatsBand } from "@/components/shared/StatsBand";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Card } from "@/components/ui/Card";
@@ -60,12 +61,18 @@ export default function AboutPage() {
                     </p>
                   ))}
                 </div>
-                <MediaFrame
-                  alt={passage.media.alt}
-                  label={passage.media.label}
-                  ratio="4/3"
-                  className={i % 2 === 1 ? "md:order-1" : undefined}
-                />
+                <div className={i % 2 === 1 ? "md:order-1" : undefined}>
+                  <MediaFrame
+                    src={passage.media.src}
+                    alt={passage.media.alt}
+                    label={passage.media.label}
+                    ratio="4/3"
+                    sizes="(min-width: 768px) 50vw, 100vw"
+                  />
+                  {passage.media.credit && (
+                    <PhotoCredit credit={passage.media.credit} />
+                  )}
+                </div>
               </article>
             ))}
           </div>
