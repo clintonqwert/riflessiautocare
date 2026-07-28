@@ -50,3 +50,74 @@ framework and should survive re-branding untouched.
 
 `"use client"` appears only in: `NavBar`, `BookingForm`, `ScrollReveal`,
 `CountUp`. Keep it that way; sections and pages stay server components.
+
+## The cinematic homepage template (`components/cinema/`)
+
+A scroll-driven 3D stage, built to be re-skinned for other automotive trades
+(PPF, tint, wrap, ceramic-coating specialists) without touching components.
+
+### What you change to adapt it
+
+1. **`src/lib/content/cinema.ts`** — the whole adaptation surface. Seven acts,
+   each pairing its copy with a camera pose, an exposure value, and a `finish`
+   value (0 = bare corrected paint, 1 = cured coating). Rewrite the acts and
+   you have a different business's story on the same rig.
+2. **The palette** in `globals.css` `@theme` (mirrored in `design-tokens.ts`).
+   The lighting rig reads `NERO.accent` and `NERO.fg` directly, so a token swap
+   re-skins the scene along with the site.
+3. **Slots** — `page.tsx` passes server-rendered nodes keyed by act id. Nothing
+   business-specific lives inside the sequence component itself.
+
+Acts can be added or removed freely; `pose.ts` interpolates across whatever
+length the array is.
+
+### Rules this template must keep
+
+1. **Copy is never trapped in the canvas.** Every act renders as an ordinary
+   `<section>` with real headings and paragraphs, server-rendered. The stage is
+   decoration layered behind it. Verify with `curl | grep` before shipping —
+   if a headline only exists in WebGL, it does not exist.
+2. **Capability gates the import, not just the render.** `capability.ts`
+   decides before `next/dynamic` resolves, so a phone, a reduced-motion
+   visitor, or a save-data connection never downloads three/drei/gsap/lenis.
+3. **`ssr: false` stays inside a Client Component** — required for the code
+   split to actually happen (`next/dist/docs/01-app/02-guides/lazy-loading.md`).
+4. **One `useFrame` owner.** `StageDirector` samples the pose once per frame and
+   drives camera, exposure, and material. Do not add competing render loops.
+5. **Scroll progress is a mutable box, not React state** (`scroll-progress.ts`).
+   Putting a per-frame value into state puts the whole tree in the animation
+   loop.
+6. **Lenis is homepage-scoped.** It mounts with the sequence and is destroyed on
+   unmount, so every other route keeps native scrolling — which is what
+   assistive tech and find-in-page behave best with.
+7. **The stage pauses off screen.** An IntersectionObserver flips `frameloop`
+   to `never`; the page continues for several sections below the sequence.
+8. **No asset downloads.** Geometry is generated in `paint-tester-geometry.ts`
+   and the environment is baked from `Lightformer` planes. No GLB, no HDR,
+   nothing licensed, nothing traced from a real manufacturer's bodywork.
+9. **Winding is load-bearing.** The solid renders front-faces only, so a
+   reversed triangle is an invisible hole and an inverted normal is a surface
+   lit from underneath. Both are silent in a screenshot. Keep the orientation
+   assertions in any geometry change.
+
+### Tuning the look
+
+Three dials, deliberately separated so each can be adjusted without touching
+the others:
+
+- **Form** — `FEATURES` in `paint-tester-geometry.ts`: Gaussian bumps in
+  (length, width). Negative amplitudes are scoops. This array is the shape's
+  personality.
+- **Light** — `RIG` in `PaintStage.tsx`. The key-to-fill ratio is what makes
+  the form read as sculpted rather than as an evenly grey blob; raising `fill`
+  is the fastest way to flatten it.
+- **Separation** — the `stage-backdrop` utility in `globals.css`. The canvas
+  renders with alpha, so the backdrop is pure CSS and costs nothing to change.
+  The form stays near-black and separates on specular, not base colour.
+
+### Client JS census (updated)
+
+`"use client"` now also appears in `components/cinema/`: `CinematicSequence`,
+`PaintStage`, `capability.ts`, `useScrollStory.ts`. All of it is homepage-only
+and all of the heavy half is behind a dynamic import. Every other route's eager
+JS is unchanged.

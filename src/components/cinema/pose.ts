@@ -1,0 +1,56 @@
+import { Vector3, MathUtils } from "three";
+import { getCinemaActs } from "@/lib/content/cinema";
+
+const acts = getCinemaActs();
+
+/** Reused every frame — allocating vectors in the render loop causes GC hitches. */
+export interface SampledPose {
+  position: Vector3;
+  target: Vector3;
+  exposure: number;
+  finish: number;
+}
+
+export function createSampledPose(): SampledPose {
+  const opening = acts[0].pose;
+  return {
+    position: new Vector3(...opening.position),
+    target: new Vector3(...opening.target),
+    exposure: opening.exposure,
+    finish: opening.finish,
+  };
+}
+
+/** Smoothstep — eases each act into the next so the camera never snaps. */
+function ease(t: number): number {
+  return t * t * (3 - 2 * t);
+}
+
+/**
+ * Reads the pose for a given scroll position by interpolating between the two
+ * acts it falls between. Writes into `out` and returns it.
+ */
+export function samplePose(progress: number, out: SampledPose): SampledPose {
+  const segments = acts.length - 1;
+  const scaled = MathUtils.clamp(progress, 0, 1) * segments;
+  const index = Math.min(Math.floor(scaled), segments - 1);
+  const t = ease(scaled - index);
+
+  const from = acts[index].pose;
+  const to = acts[index + 1].pose;
+
+  out.position.set(
+    MathUtils.lerp(from.position[0], to.position[0], t),
+    MathUtils.lerp(from.position[1], to.position[1], t),
+    MathUtils.lerp(from.position[2], to.position[2], t),
+  );
+  out.target.set(
+    MathUtils.lerp(from.target[0], to.target[0], t),
+    MathUtils.lerp(from.target[1], to.target[1], t),
+    MathUtils.lerp(from.target[2], to.target[2], t),
+  );
+  out.exposure = MathUtils.lerp(from.exposure, to.exposure, t);
+  out.finish = MathUtils.lerp(from.finish, to.finish, t);
+
+  return out;
+}
