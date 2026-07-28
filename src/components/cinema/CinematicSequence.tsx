@@ -95,7 +95,17 @@ export function CinematicSequence({ acts, slots }: CinematicSequenceProps) {
         aria-hidden
         className="pointer-events-none sticky top-0 h-svh w-full overflow-hidden"
       >
-        {cinematic ? <PaintStage active={stageVisible} /> : <StageFallback />}
+        {cinematic ? (
+          <>
+            {/* The canvas renders with alpha, so this gradient is what the form
+                is read against. Kept in CSS rather than in the scene: free to
+                render, and one place to tune the separation. */}
+            <div className="stage-backdrop absolute inset-0" />
+            <PaintStage active={stageVisible} />
+          </>
+        ) : (
+          <StageFallback />
+        )}
 
         {/*
           Legibility scrim. Copy sits in the left column, so the surface is

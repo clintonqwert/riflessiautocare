@@ -91,6 +91,22 @@
   );
 }
 
+/* Backdrop behind the homepage's WebGL stage. The canvas renders with alpha,
+   so this gradient is what the paint form is read against — a lifted pool at
+   the centre falling to obsidian at the edges, the way a plinth is lit in a
+   showroom. Lifting the centre here is the contrast lever: the form itself
+   stays near-black and separates on specular, not on base colour. */
+@utility stage-backdrop {
+  background:
+    radial-gradient(
+      58% 54% at 52% 46%,
+      color-mix(in oklab, var(--color-overlay) 82%, #ffffff) 0%,
+      var(--color-overlay) 32%,
+      var(--color-raised) 60%,
+      var(--color-surface) 100%
+    );
+}
+
 /* Paint-reflection placeholder for gallery/media frames until real
    photography lands — a dark curved-panel gradient, deliberately not a
    stock-photo look. Consumed only by MediaFrame. */

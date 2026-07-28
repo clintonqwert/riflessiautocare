@@ -92,9 +92,28 @@ length the array is.
    assistive tech and find-in-page behave best with.
 7. **The stage pauses off screen.** An IntersectionObserver flips `frameloop`
    to `never`; the page continues for several sections below the sequence.
-8. **No asset downloads.** Geometry is generated in `panel-geometry.ts` and the
-   environment is baked from `Lightformer` planes. No GLB, no HDR, nothing
-   licensed, nothing traced from a real manufacturer's bodywork.
+8. **No asset downloads.** Geometry is generated in `paint-tester-geometry.ts`
+   and the environment is baked from `Lightformer` planes. No GLB, no HDR,
+   nothing licensed, nothing traced from a real manufacturer's bodywork.
+9. **Winding is load-bearing.** The solid renders front-faces only, so a
+   reversed triangle is an invisible hole and an inverted normal is a surface
+   lit from underneath. Both are silent in a screenshot. Keep the orientation
+   assertions in any geometry change.
+
+### Tuning the look
+
+Three dials, deliberately separated so each can be adjusted without touching
+the others:
+
+- **Form** — `FEATURES` in `paint-tester-geometry.ts`: Gaussian bumps in
+  (length, width). Negative amplitudes are scoops. This array is the shape's
+  personality.
+- **Light** — `RIG` in `PaintStage.tsx`. The key-to-fill ratio is what makes
+  the form read as sculpted rather than as an evenly grey blob; raising `fill`
+  is the fastest way to flatten it.
+- **Separation** — the `stage-backdrop` utility in `globals.css`. The canvas
+  renders with alpha, so the backdrop is pure CSS and costs nothing to change.
+  The form stays near-black and separates on specular, not base colour.
 
 ### Client JS census (updated)
 

@@ -80,9 +80,10 @@ const acts: CinemaAct[] = [
     eyebrow: "La Mano",
     heading: "Correction happens by hand, one panel at a time.",
     body: "Two-bucket wash, clay bar decontamination, then machine polish worked panel by panel. Nothing spinning touches your paint on an automated arm, and nothing is hurried along to free the bay for the next car.",
+    // Framed on the front-flank scoop, where the light strip bends hardest.
     pose: {
-      position: [-1.7, 0.92, 2.05],
-      target: [-0.35, 0.32, 0.2],
+      position: [-2.1, 0.78, 1.85],
+      target: [-0.92, 0.22, -0.42],
       exposure: 1.18,
       finish: 0.62,
     },
