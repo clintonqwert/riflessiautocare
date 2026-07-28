@@ -12,6 +12,15 @@ import { StageFallback } from "./StageFallback";
 // keeps three, drei, gsap, and lenis out of the main bundle.
 const PaintStage = dynamic(() => import("./PaintStage"), { ssr: false });
 
+// The import expression sits inside a branch the bundler resolves at build
+// time, so the tuner and its module never enter a production bundle.
+const StageTuner =
+  process.env.NODE_ENV === "development"
+    ? dynamic(() => import("./StageTuner").then((m) => m.StageTuner), {
+        ssr: false,
+      })
+    : null;
+
 interface CinematicSequenceProps {
   acts: CinemaAct[];
   /**
@@ -116,6 +125,8 @@ export function CinematicSequence({ acts, slots }: CinematicSequenceProps) {
           className="absolute inset-0 bg-[linear-gradient(180deg,var(--color-surface)_0%,color-mix(in_oklab,var(--color-surface)_72%,transparent)_38%,transparent_100%)] md:bg-[linear-gradient(100deg,var(--color-surface)_0%,color-mix(in_oklab,var(--color-surface)_88%,transparent)_30%,transparent_68%)]"
         />
       </div>
+
+      {StageTuner && cinematic && <StageTuner />}
 
       {/* Pulled back over the sticky stage so the acts scroll across it. */}
       <div className="relative -mt-[100svh]">
