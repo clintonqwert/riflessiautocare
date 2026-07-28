@@ -1,4 +1,5 @@
 import { BufferGeometry, BufferAttribute } from "three";
+import { STAGE_DEFAULTS, type StageConfig } from "./stage-config";
 
 /**
  * A dealership paint tester — the sculpted display solid a body shop or
@@ -19,30 +20,27 @@ import { BufferGeometry, BufferAttribute } from "three";
 const SEGMENTS_T = 176; // along the length
 const SEGMENTS_S = 104; // across the width
 
-const LENGTH = 4.6;
-const WIDTH_SCALE = 1.32;
-const CROWN_HEIGHT = 0.94;
-/** Height of the near-vertical wall where the top surface rolls over. */
-const EDGE_HEIGHT = 0.28;
 /** Base is tucked slightly inside the widest point, so the flank bulges. */
 const BASE_TUCK = 0.94;
 /** Keeps the tapered ends from collapsing into degenerate triangles. */
 const MIN_HALF_WIDTH = 0.03;
 
+type Form = StageConfig["form"];
+
 /** Plan-view silhouette: blunt rounded nose, fuller toward the tail. */
-function halfWidth(t: number): number {
+function halfWidth(t: number, form: Form): number {
   const blunt = Math.pow(Math.sin(Math.PI * t), 0.45);
-  return Math.max(MIN_HALF_WIDTH, WIDTH_SCALE * blunt * (0.8 + 0.3 * t));
+  return Math.max(MIN_HALF_WIDTH, form.widthScale * blunt * (0.8 + 0.3 * t));
 }
 
 /** Where the top surface meets the skirt — tapers to nothing at both ends. */
-function edgeHeight(t: number): number {
-  return EDGE_HEIGHT * Math.pow(Math.sin(Math.PI * t), 0.5);
+function edgeHeight(t: number, form: Form): number {
+  return form.edgeHeight * Math.pow(Math.sin(Math.PI * t), 0.5);
 }
 
 /** The lengthwise crown of the dome. */
-function crown(t: number): number {
-  return CROWN_HEIGHT * Math.pow(Math.sin(Math.PI * (0.02 + 0.96 * t)), 0.7);
+function crown(t: number, form: Form): number {
+  return form.crownHeight * Math.pow(Math.sin(Math.PI * (0.02 + 0.96 * t)), 0.7);
 }
 
 /**
@@ -69,21 +67,21 @@ const FEATURES: ReadonlyArray<{
   { t: 0.16, s: 0.16, rt: 0.11, rs: 0.34, amp: -0.07 },
 ];
 
-function featureOffset(t: number, s: number): number {
+function featureOffset(t: number, s: number, form: Form): number {
   let sum = 0;
   for (const f of FEATURES) {
     const dt = (t - f.t) / f.rt;
     const ds = (s - f.s) / f.rs;
     sum += f.amp * Math.exp(-(dt * dt + ds * ds));
   }
-  return sum;
+  return sum * form.featureDepth;
 }
 
-function topHeight(t: number, s: number): number {
-  // Exponent 0.9 lands the dome on the silhouette at roughly a 2:1 slope. Any
-  // lower and the top drops away almost vertically, which fights the rim
+function topHeight(t: number, s: number, form: Form): number {
+  // archExponent ~0.9 lands the dome on the silhouette at roughly a 2:1 slope.
+  // Much lower and the top drops away almost vertically, which fights the rim
   // crease below it and reads as a knife edge rather than a rollover.
-  const arch = Math.pow(Math.max(0, 1 - s * s), 0.9);
+  const arch = Math.pow(Math.max(0, 1 - s * s), form.archExponent);
   // Features fade toward the silhouette edge so they never break the outline.
   const featureMask = Math.pow(arch, 0.5);
   // A crisp character line running the length, catching a hard highlight.
@@ -91,14 +89,16 @@ function topHeight(t: number, s: number): number {
     0.045 * Math.exp(-Math.pow((s - 0.52) / 0.085, 2)) * Math.sin(Math.PI * t);
 
   return (
-    edgeHeight(t) +
-    crown(t) * arch +
-    featureOffset(t, s) * featureMask +
+    edgeHeight(t, form) +
+    crown(t, form) * arch +
+    featureOffset(t, s, form) * featureMask +
     crease
   );
 }
 
-export function createPaintTesterGeometry(): BufferGeometry {
+export function createPaintTesterGeometry(
+  form: Form = STAGE_DEFAULTS.form,
+): BufferGeometry {
   const cols = SEGMENTS_T + 1;
   const rows = SEGMENTS_S + 1;
 
@@ -120,15 +120,15 @@ export function createPaintTesterGeometry(): BufferGeometry {
 
   for (let i = 0; i < cols; i++) {
     const t = i / SEGMENTS_T;
-    const x = LENGTH * (t - 0.5);
-    const w = halfWidth(t);
-    const yEdge = edgeHeight(t);
+    const x = form.length * (t - 0.5);
+    const w = halfWidth(t, form);
+    const yEdge = edgeHeight(t, form);
 
     // Top surface.
     for (let j = 0; j < rows; j++) {
       const v = j / SEGMENTS_S;
       const s = v * 2 - 1;
-      setVertex(i * rows + j, x, topHeight(t, s), w * s, t, v);
+      setVertex(i * rows + j, x, topHeight(t, s, form), w * s, t, v);
     }
 
     // Skirt. Its top vertices deliberately duplicate the top surface's edge so
