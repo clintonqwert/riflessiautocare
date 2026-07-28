@@ -98,6 +98,26 @@ npm run build       # production build — all routes static
 
 Without `BOOKING_WEBHOOK_URL` set, booking submissions are logged to the server console instead of delivered — so no lead is lost in development.
 
+### Stock photography (optional)
+
+[.mcp.json](.mcp.json) registers an Unsplash MCP server for sourcing placeholder imagery behind the `MediaFrame` components until real photography is shot. It is a local authoring aid — no application code imports it, and nothing in the build or deploy path depends on it.
+
+It needs two things that do not travel with the repo. Set an access key from [unsplash.com/developers](https://unsplash.com/developers):
+
+```bash
+export UNSPLASH_ACCESS_KEY="your_key"   # add to your shell profile
+```
+
+Then install the server at the path `.mcp.json` points to, pinning the MCP SDK — `@drumnation/unsplash-smart-mcp-server` depends on `fastmcp@1.x`, which registers a `completion/complete` handler without declaring the matching capability, and SDK 1.22.0 added an assertion that makes that combination crash on startup:
+
+```bash
+mkdir -p ~/.claude/mcp-servers/unsplash-smart && cd $_ && npm init -y
+npm pkg set 'overrides.@modelcontextprotocol/sdk=1.21.2'
+npm install @drumnation/unsplash-smart-mcp-server
+```
+
+The install lives outside the repo so its dependency tree stays out of this project's. Skip all of this if you are not sourcing images — the rest of the site is unaffected.
+
 ## Deployment
 
 - `main` auto-deploys to production on Vercel.
