@@ -9,6 +9,11 @@ interface MediaFrameProps {
   ratio?: "4/3" | "16/9";
   /** Small caption chip rendered inside the frame's lower-left corner */
   label?: string;
+  /**
+   * Responsive size hint. The default suits a 3-up grid; pass the real value
+   * for other layouts, or the browser picks an undersized file and upscales it.
+   */
+  sizes?: string;
   className?: string;
 }
 
@@ -23,6 +28,7 @@ export function MediaFrame({
   alt,
   ratio = "4/3",
   label,
+  sizes = "(min-width: 768px) 33vw, 100vw",
   className,
 }: MediaFrameProps) {
   return (
@@ -39,7 +45,7 @@ export function MediaFrame({
           src={src}
           alt={alt}
           fill
-          sizes="(min-width: 768px) 33vw, 100vw"
+          sizes={sizes}
           className="object-cover"
         />
       ) : (

@@ -5,11 +5,25 @@
  * facility. Daylight is described as the strength it is.
  */
 
+import type { PhotoCredit } from "@/types/content";
+
 export interface AboutPassage {
   heading: string;
   /** Rendered as separate <p> elements, in order. */
   body: string[];
-  media: { alt: string; label: string };
+  media: {
+    alt: string;
+    label: string;
+    /**
+     * Real photo path under /public. Absent -> MediaFrame renders its gradient
+     * placeholder. Only frames that depict nothing specific about this
+     * business may hold a licensed stock photo; the bay and the owner wait for
+     * genuine photography.
+     */
+    src?: string;
+    /** Required whenever `src` is a licensed photo. */
+    credit?: PhotoCredit;
+  };
 }
 
 export interface Standard {
@@ -24,7 +38,21 @@ const passages: AboutPassage[] = [
       "It is the only test that matters here. When the work is finished, the paint should hand back a clean picture of whatever is standing in front of it — no haze softening the edges, no swirls breaking up the light.",
       "That standard is the reason this operation is shaped the way it is. Paint that reflects properly needs hours, honest light, and someone who has nowhere else to be that afternoon.",
     ],
-    media: { alt: "A reflection held in freshly polished paint", label: "The standard" },
+    // Abstract paint surface — claims nothing about this bay or its work, so a
+    // licensed photo is honest here. Every other frame on the site waits for
+    // genuine photography.
+    media: {
+      alt: "A reflection held in the compound curve of freshly polished paint",
+      label: "The standard",
+      src: "/images/polished-paint-reflection.jpg",
+      credit: {
+        photographer: "Quentin Martinez",
+        profileUrl: "https://unsplash.com/@quentin_martinez",
+        photoUrl:
+          "https://unsplash.com/photos/a-close-up-view-of-a-shiny-surface-V8H-K2032Kc",
+        source: "Unsplash",
+      },
+    },
   },
   {
     heading: "A bay, not a showroom.",

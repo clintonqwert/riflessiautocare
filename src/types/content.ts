@@ -84,6 +84,24 @@ export interface ProcessStep {
   description: string;
 }
 
+/**
+ * Credit for a licensed photograph. Required by Unsplash's API guidelines for
+ * anything sourced through their API, and good practice regardless.
+ *
+ * Only for imagery that depicts nothing specific about this business. Photos
+ * of the bay, the owner, or customer vehicles must be genuine — see the
+ * no-invention rule in site.ts and the note in gallery.ts.
+ */
+export interface PhotoCredit {
+  photographer: string;
+  /** Photographer's profile page. */
+  profileUrl: string;
+  /** The photo's own page on the source site. */
+  photoUrl: string;
+  /** e.g. "Unsplash" */
+  source: string;
+}
+
 export interface GalleryItem {
   slug: string;
   vehicle: string;
