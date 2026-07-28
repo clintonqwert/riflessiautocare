@@ -1,13 +1,8 @@
 /** Form data contracts shared by the booking form and its Server Action. */
 
-import { VEHICLE_SIZES, type ServiceSlug } from "@/types/content";
+import { SERVICE_SLUGS, VEHICLE_SIZES, type ServiceSlug } from "@/types/content";
 
-export const SERVICE_OPTIONS: ServiceSlug[] = [
-  "interior-detailing",
-  "exterior-detailing",
-  "full-detail",
-  "ceramic-coating",
-];
+export const SERVICE_OPTIONS: readonly ServiceSlug[] = SERVICE_SLUGS;
 
 export { VEHICLE_SIZES };
 

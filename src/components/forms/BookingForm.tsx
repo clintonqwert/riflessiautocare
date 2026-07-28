@@ -4,21 +4,9 @@ import { useActionState, useEffect, useRef } from "react";
 import { submitBooking } from "@/lib/actions/submit-booking";
 import { SERVICE_OPTIONS, VEHICLE_SIZES } from "@/types/forms";
 import type { FormResult } from "@/types/forms";
+import { SERVICE_LABELS, VEHICLE_SIZE_LABELS } from "@/types/content";
 import { inputBase, inputError, labelBase, errorBanner, errorText } from "@/components/ui/field";
 import { buttonClasses } from "@/components/ui/button";
-
-const SERVICE_LABELS: Record<(typeof SERVICE_OPTIONS)[number], string> = {
-  "interior-detailing": "Interior Detail",
-  "exterior-detailing": "Exterior Detail",
-  "full-detail": "Signature Full Detail",
-  "ceramic-coating": "Ceramic Coating",
-};
-
-const SIZE_LABELS: Record<(typeof VEHICLE_SIZES)[number], string> = {
-  "coupe-sedan": "Coupe / Sedan",
-  "suv-crossover": "SUV / Crossover",
-  "truck-van": "Truck / Van",
-};
 
 function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) return null;
@@ -182,7 +170,7 @@ export function BookingForm() {
             </option>
             {VEHICLE_SIZES.map((opt) => (
               <option key={opt} value={opt}>
-                {SIZE_LABELS[opt]}
+                {VEHICLE_SIZE_LABELS[opt]}
               </option>
             ))}
           </select>

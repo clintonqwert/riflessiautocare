@@ -1,4 +1,4 @@
-import type { AddOn, PricingPackage } from "@/types/content";
+import type { AddOn, PricingPackage, ServiceSlug } from "@/types/content";
 
 // TODO(owner): every dollar figure below is a placeholder pending owner
 // sign-off (no-invention rule). Confirm before launch.
@@ -70,15 +70,34 @@ export function getPricingPackages(): PricingPackage[] {
   return packages;
 }
 
+function requirePackage(slug: ServiceSlug): PricingPackage {
+  const pkg = packages.find((p) => p.service === slug);
+  if (!pkg) {
+    throw new Error(
+      `pricing.ts: no package for service "${slug}" — was a service slug renamed?`,
+    );
+  }
+  return pkg;
+}
+
 export function getFeaturedPackages(): PricingPackage[] {
   // Home shows three: the featured anchor centered by display order.
+  const featured = packages.find((p) => p.featured);
+  if (!featured) {
+    throw new Error("pricing.ts: no package is flagged `featured`.");
+  }
   return [
-    packages.find((p) => p.service === "interior-detailing")!,
-    packages.find((p) => p.featured)!,
-    packages.find((p) => p.service === "ceramic-coating")!,
+    requirePackage("interior-detailing"),
+    featured,
+    requirePackage("ceramic-coating"),
   ];
 }
 
 export function getAddOns(): AddOn[] {
   return addOns;
+}
+
+/** The package for one service — throws (build-time) if the slug has no package. */
+export function getPackageForService(slug: ServiceSlug): PricingPackage {
+  return requirePackage(slug);
 }

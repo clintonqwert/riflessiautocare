@@ -3,6 +3,8 @@
  * NavBar and SiteFooter both render from these — never hardcode links.
  */
 
+import { SERVICE_LABELS, SERVICE_SLUGS } from "@/types/content";
+
 export interface NavLink {
   label: string;
   href: string;
@@ -20,12 +22,10 @@ export const PRIMARY_CTA: NavLink = {
   href: "/contact",
 };
 
-export const SERVICES_NAV: NavLink[] = [
-  { label: "Interior Detail", href: "/services/interior-detailing" },
-  { label: "Exterior Detail", href: "/services/exterior-detailing" },
-  { label: "Signature Full Detail", href: "/services/full-detail" },
-  { label: "Ceramic Coating", href: "/services/ceramic-coating" },
-];
+export const SERVICES_NAV: NavLink[] = SERVICE_SLUGS.map((slug) => ({
+  label: SERVICE_LABELS[slug],
+  href: `/services/${slug}`,
+}));
 
 export const SERVICES_COLUMN: { heading: string; links: NavLink[] } = {
   heading: "Services",

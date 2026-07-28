@@ -1,9 +1,9 @@
-import type { DetailService, ServiceSlug } from "@/types/content";
+import { SERVICE_LABELS, type DetailService, type ServiceSlug } from "@/types/content";
 
 const services: DetailService[] = [
   {
     slug: "interior-detailing",
-    name: "Interior Detail",
+    name: SERVICE_LABELS["interior-detailing"],
     title: "Interior Car Detailing in Metro Vancouver — Riflessi Auto Care",
     description:
       "Deep interior detailing by private drop-off in Metro Vancouver. Steam, extraction, leather care — one vehicle at a time.",
@@ -45,7 +45,7 @@ const services: DetailService[] = [
   },
   {
     slug: "exterior-detailing",
-    name: "Exterior Detail",
+    name: SERVICE_LABELS["exterior-detailing"],
     title: "Exterior Car Detailing in Metro Vancouver — Riflessi Auto Care",
     description:
       "Hand wash, clay bar, machine polish, and paint protection by private drop-off in Metro Vancouver.",
@@ -87,7 +87,7 @@ const services: DetailService[] = [
   },
   {
     slug: "full-detail",
-    name: "Signature Full Detail",
+    name: SERVICE_LABELS["full-detail"],
     title: "Full Car Detailing in Metro Vancouver — Riflessi Auto Care",
     description:
       "The complete Riflessi treatment: full interior and exterior detail in one visit. Drop off in the morning, drive home reset.",
@@ -127,7 +127,7 @@ const services: DetailService[] = [
   },
   {
     slug: "ceramic-coating",
-    name: "Ceramic Coating",
+    name: SERVICE_LABELS["ceramic-coating"],
     title: "Ceramic Coating in Metro Vancouver — Riflessi Auto Care",
     description:
       "Professional ceramic coating with full paint prep, by private drop-off in Metro Vancouver. Years of protection, applied without shortcuts.",

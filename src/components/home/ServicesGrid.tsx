@@ -1,20 +1,8 @@
 import Link from "next/link";
 import { Card } from "@/components/ui/Card";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import {
-  IconDroplet,
-  IconSparkle,
-  IconSteeringWheel,
-  IconShield,
-} from "@/components/ui/icons";
+import { SERVICE_ICONS } from "@/components/services/service-icons";
 import type { DetailService } from "@/types/content";
-
-const SERVICE_ICONS: Record<DetailService["slug"], React.ComponentType<React.SVGProps<SVGSVGElement>>> = {
-  "interior-detailing": IconSteeringWheel,
-  "exterior-detailing": IconDroplet,
-  "full-detail": IconSparkle,
-  "ceramic-coating": IconShield,
-};
 
 export function ServicesGrid({ services }: { services: DetailService[] }) {
   return (
