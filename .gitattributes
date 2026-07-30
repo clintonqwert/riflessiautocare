@@ -1,0 +1,3 @@
+# The workstation is Windows and the MacBook is macOS. Normalize to LF in the
+# repository so a checkout on either machine never produces line-ending churn.
+* text=auto eol=lf
