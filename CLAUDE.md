@@ -14,4 +14,18 @@ Read `ai-context/` and `docs/project-analysis.md` before planning material work.
 
 ## Roles
 
-Use the existing `.claude/skills/` roles: `builder` implements; `reviewer`, `tester`, `auditor` (CTO/SEO/performance/a11y), and `content-strategist` provide independent report-only review.
+Work goes through the roles in `.claude/skills/`. They are explicit-invocation skills — invoke them by name; they do not activate on their own.
+
+| Role | Skill | Authority | Output |
+| --- | --- | --- | --- |
+| Lead engineer | `builder` | The only role that edits code. One branch, one PR per task. | Working change and verification summary |
+| Staff reviewer | `reviewer` | Review-only | P0/P1/P2 findings posted to the PR |
+| QA engineer | `tester` | Review-only | PASS/FAIL evidence per verification step |
+| CTO / technical auditor | `auditor` | Review-only. Owns technical SEO, accessibility, performance, and production readiness. | Scored P0/P1/P2 report |
+| Content / SEO strategist | `content-strategist` | Review-only. Owns information architecture, messaging, SEO content, and CTAs. | Paste-ready copy and structure brief |
+| UI/UX reference | `ui-ux-pro-max` | Advisory | Design recommendations |
+
+- Feature work goes through `builder`, not ad-hoc editing in a plain session.
+- Every non-trivial PR gets `reviewer`. Anything touching the booking path, public claims, or performance also gets `tester` and `auditor`.
+- Only `builder` writes files. The other roles report, the owner decides, and `builder` implements the accepted findings.
+- There is no separate SEO role and one must not be created: technical SEO belongs to `auditor`, content SEO to `content-strategist`.
