@@ -7,9 +7,9 @@
 
 ## Engineering protection
 
-- Add CI for lint, typecheck, and build.
-- Add focused booking pipeline tests: validation, spam gate, and webhook retry/timeout behavior.
-- Add a scoped Content-Security-Policy and a Lighthouse budget gate.
+- Add focused booking pipeline tests: validation, spam gate, and webhook retry/timeout behavior — no test runner is installed yet.
+- Add a `lighthouserc.json` and wire a Lighthouse step into CI; Driftpilot's config is the reference.
+- Add a scoped Content-Security-Policy.
 
 ## Growth
 
