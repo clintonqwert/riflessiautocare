@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Read from .nvmrc so CI and both dev machines can't drift apart.
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install (frozen lockfile)
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      # Only the build evaluates src/lib/seo.ts, which throws in production
+      # builds without this var. The value here just has to be a valid origin
+      # for metadata output — keep it in sync with _siteUrlFallback there.
+      # TODO(owner): update when the production domain is confirmed.
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://riflessiautocare.ca
