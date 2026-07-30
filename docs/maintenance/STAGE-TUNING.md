@@ -37,8 +37,16 @@ build time. Verified by grepping the production chunks.
 | `widthScale` | 0.6 – 2.2 | Overall width. Past ~1.8 it stops reading as automotive. |
 | `crownHeight` | 0.3 – 1.8 | Dome height. The single biggest silhouette change. |
 | `edgeHeight` | 0 – 0.8 | The vertical wall at the base. 0 removes the rim entirely. |
-| `archExponent` | 0.5 – 1.6 | How the dome meets its outline. **Below 0.75** it drops away almost vertically and fights the rim crease; **above 1.2** it flattens toward a tabletop. 0.9 is the sweet spot. |
-| `featureDepth` | 0 – 2.5 | Scales all five scoops and the haunch. 0 = plain dome, 1 = shipped, 2+ = heavily sculpted. |
+| `archExponent` | 0.5 – 1.6 | How the dome meets its outline. Low values drop away almost vertically for a hard shoulder; **above 1.2** it flattens toward a tabletop. Currently shipped at the minimum, 0.5, for a deliberately sharp edge — measured at a 6.8:1 slope where 0.9 gives 2:1. The geometry check flags anything past 8:1. |
+| `featureDepth` | 0 – 2.5 | Scales all five scoops and the haunch. 0 = plain dome, ~1 = shipped, 2+ = heavily sculpted. |
+
+> **After changing anything under Form, re-run the camera-path check.** Growing
+> the shape can put a camera pose inside the mesh, and because the solid renders
+> front-faces only the form simply vanishes at that point in the scroll rather
+> than looking obviously broken. The `craft` act is the tightest pose in the
+> sequence and will always fail first. The mesh centres itself vertically from
+> its own bounds, so `crownHeight` alone is safe; `length` and `widthScale` are
+> the risky ones.
 
 Individual scoop positions are the `FEATURES` array in
 `paint-tester-geometry.ts` — each is a Gaussian bump in (length, width) with a

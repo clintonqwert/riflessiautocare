@@ -64,18 +64,18 @@ export interface StageConfig {
 
 export const STAGE_DEFAULTS: StageConfig = {
   form: {
-    length: 4.6,
-    widthScale: 1.32,
-    crownHeight: 0.94,
-    edgeHeight: 0.28,
-    archExponent: 0.9,
-    featureDepth: 1,
+    length: 6.65,
+    widthScale: 1.96,
+    crownHeight: 1.24,
+    edgeHeight: 0.34,
+    archExponent: 0.5,
+    featureDepth: 1.05,
   },
   material: {
-    color: NERO.raised,
-    metalness: 0.65,
-    roughnessBare: 0.42,
-    roughnessCoated: 0.045,
+    color: "#f0f2f4",
+    metalness: 0.23,
+    roughnessBare: 0.19,
+    roughnessCoated: 0,
     envIntensityCoated: 2.3,
   },
   light: {

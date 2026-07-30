@@ -115,8 +115,17 @@ function PaintTester({
   const geometry = useMemo(() => createPaintTesterGeometry(form), [form]);
   useEffect(() => () => geometry.dispose(), [geometry]);
 
+  // The mesh is built sitting on y=0, so it has to be lifted to sit around the
+  // origin the camera poses aim at. Derived from its own bounds rather than
+  // hard-coded: change crownHeight in the tuner and the framing still holds.
+  const centreY = useMemo(() => {
+    geometry.computeBoundingBox();
+    const box = geometry.boundingBox;
+    return box ? -(box.max.y + box.min.y) / 2 : 0;
+  }, [geometry]);
+
   return (
-    <mesh geometry={geometry} position={[0, -0.55, 0]}>
+    <mesh geometry={geometry} position={[0, centreY, 0]}>
       {/*
         Automotive paint is pigment under a clear coat, not bare metal — so the
         base stays dark and mid-metalness while the clearcoat layer does the

@@ -81,9 +81,12 @@ const acts: CinemaAct[] = [
     heading: "Correction happens by hand, one panel at a time.",
     body: "Two-bucket wash, clay bar decontamination, then machine polish worked panel by panel. Nothing spinning touches your paint on an automated arm, and nothing is hurried along to free the bay for the next car.",
     // Framed on the front-flank scoop, where the light strip bends hardest.
+    // Pulled clear of the form's half-width — the closest pose in the whole
+    // sequence, so it is the first to clip if the shape is widened. Re-run the
+    // camera-path check after changing `form` in stage-config.ts.
     pose: {
-      position: [-2.1, 0.78, 1.85],
-      target: [-0.92, 0.22, -0.42],
+      position: [-3.0, 1.15, 3.05],
+      target: [-1.32, 0.29, -0.7],
       exposure: 1.18,
       finish: 0.62,
     },
