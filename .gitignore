@@ -4,6 +4,8 @@ node_modules/
 .env*
 .DS_Store
 .claude/worktrees/
+# per-machine Claude settings — differs between the workstation and the MacBook
+.claude/settings.local.json
 .vscode
 .devswarm-temp/
 # local session scratch — never committed (builder skill)
