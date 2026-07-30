@@ -104,7 +104,7 @@ length the array is.
    assistive tech and find-in-page behave best with.
 7. **The stage pauses off screen.** An IntersectionObserver flips `frameloop`
    to `never`; the page continues for several sections below the sequence.
-8. **No asset downloads.** Geometry is generated in `paint-tester-geometry.ts`
+8. **No asset downloads.** Geometry is generated in `car-silhouette-geometry.ts`
    and the environment is baked from `Lightformer` planes. No GLB, no HDR,
    nothing licensed, nothing traced from a real manufacturer's bodywork.
 9. **Winding is load-bearing.** The solid renders front-faces only, so a
@@ -126,9 +126,9 @@ wiring.
 
 Two things deliberately stay out of the panel:
 
-- **Individual scoop placement** — the `FEATURES` array in
-  `paint-tester-geometry.ts`. Five features × four numbers is twenty sliders;
-  `featureDepth` scales them all instead.
+- **The silhouette curves** — `SILHOUETTE`, `BODY_WIDTH`, `ROOF_WIDTH`, and
+  `SHOULDER_HEIGHT` in `car-silhouette-geometry.ts`. Those four keyframe arrays
+  are the car; the panel exposes overall proportions instead.
 - **The seven camera poses** — `src/lib/content/cinema.ts`. Those are content,
   not look: changing them changes the story. Re-run the camera-path check after
   editing so the camera never ends up inside the mesh.

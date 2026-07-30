@@ -5,7 +5,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, Lightformer } from "@react-three/drei";
 import { MathUtils, Vector3, type MeshPhysicalMaterial } from "three";
 import { getOpeningPose } from "@/lib/content/cinema";
-import { createPaintTesterGeometry } from "./paint-tester-geometry";
+import { createCarSilhouetteGeometry } from "./car-silhouette-geometry";
 import { createSampledPose, samplePose } from "./pose";
 import { stageProgress } from "./scroll-progress";
 import {
@@ -101,7 +101,7 @@ function StageDirector({ materialRef }: { materialRef: MaterialRef }) {
   return null;
 }
 
-function PaintTester({
+function CarBody({
   materialRef,
   form,
   material,
@@ -112,7 +112,7 @@ function PaintTester({
 }) {
   // Rebuilt exactly when a form slider moves. ~19k vertices of pure
   // arithmetic, cheap enough to regenerate on drag.
-  const geometry = useMemo(() => createPaintTesterGeometry(form), [form]);
+  const geometry = useMemo(() => createCarSilhouetteGeometry(form), [form]);
   useEffect(() => () => geometry.dispose(), [geometry]);
 
   // The mesh is built sitting on y=0, so it has to be lifted to sit around the
@@ -239,7 +239,7 @@ export default function PaintStage({ active }: { active: boolean }) {
       }}
     >
       <ShowroomRig light={config.light} />
-      <PaintTester
+      <CarBody
         materialRef={materialRef}
         form={config.form}
         material={config.material}

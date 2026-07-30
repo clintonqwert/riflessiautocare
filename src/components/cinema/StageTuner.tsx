@@ -44,20 +44,26 @@ type Control = RangeControl | ColorControl;
 
 const SECTIONS: { title: string; note: string; controls: Control[] }[] = [
   {
-    title: "Form",
-    note: "Rebuilds the mesh. Drag freely — it is pure arithmetic.",
+    title: "Body",
+    note: "Rebuilds the mesh. Widening it can push a camera inside — see the note in STAGE-TUNING.md.",
     controls: [
-      { kind: "range", group: "form", key: "length", label: "Length", min: 2.5, max: 7, step: 0.05 },
-      { kind: "range", group: "form", key: "widthScale", label: "Width", min: 0.6, max: 2.2, step: 0.02 },
-      { kind: "range", group: "form", key: "crownHeight", label: "Crown height", min: 0.3, max: 1.8, step: 0.02 },
-      { kind: "range", group: "form", key: "edgeHeight", label: "Rim height", min: 0, max: 0.8, step: 0.01 },
+      { kind: "range", group: "form", key: "length", label: "Length", min: 3, max: 9, step: 0.05 },
+      { kind: "range", group: "form", key: "width", label: "Width", min: 0.6, max: 2.6, step: 0.02 },
       {
-        kind: "range", group: "form", key: "archExponent", label: "Shoulder", min: 0.5, max: 1.6, step: 0.02,
-        hint: "Low = sharp knife edge, high = flat tabletop",
+        kind: "range", group: "form", key: "height", label: "Height", min: 0.8, max: 2.6, step: 0.02,
+        hint: "Scales the whole silhouette — the roofline keeps its shape",
       },
       {
-        kind: "range", group: "form", key: "featureDepth", label: "Scoop depth", min: 0, max: 2.5, step: 0.05,
-        hint: "0 = plain dome, 1 = shipped, 2+ = heavily sculpted",
+        kind: "range", group: "form", key: "tumblehome", label: "Tumblehome", min: 0, max: 1, step: 0.01,
+        hint: "How far the glasshouse pulls in above the belt line",
+      },
+      {
+        kind: "range", group: "form", key: "haunch", label: "Rear haunch", min: 0, max: 2.5, step: 0.05,
+        hint: "Width over the rear axle. 0 removes the hips",
+      },
+      {
+        kind: "range", group: "form", key: "sillTuck", label: "Sill tuck", min: 0.5, max: 1, step: 0.01,
+        hint: "1 = slab sided, lower pulls the sills under",
       },
     ],
   },

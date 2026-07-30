@@ -14,19 +14,21 @@ export interface StageConfig {
     /** Nose-to-tail length in scene units. */
     length: number;
     /** Overall width multiplier. */
-    widthScale: number;
-    /** How high the dome crowns at its peak. */
-    crownHeight: number;
-    /** Height of the near-vertical wall where the top rolls over. */
-    edgeHeight: number;
+    width: number;
     /**
-     * How steeply the dome meets the silhouette. Below ~0.75 the top drops
-     * away almost vertically and fights the rim crease; above ~1.1 it flattens
-     * toward a tabletop.
+     * Overall height multiplier. Scales the whole silhouette, so the car gets
+     * taller without the roofline losing its shape.
      */
-    archExponent: number;
-    /** Multiplies every sculpted scoop and haunch. 0 = a plain dome. */
-    featureDepth: number;
+    height: number;
+    /**
+     * How far the greenhouse pulls in above the belt line. 0 = glass sits flush
+     * with the flanks, 1 = a strongly tapered cabin.
+     */
+    tumblehome: number;
+    /** Extra width over the rear axle. 0 removes the hips entirely. */
+    haunch: number;
+    /** How far the sills tuck under the widest point. 1 = slab sided. */
+    sillTuck: number;
   };
   material: {
     /** Base paint colour. Reflections do most of the work, so keep it dark. */
@@ -65,11 +67,11 @@ export interface StageConfig {
 export const STAGE_DEFAULTS: StageConfig = {
   form: {
     length: 6.65,
-    widthScale: 1.96,
-    crownHeight: 1.24,
-    edgeHeight: 0.34,
-    archExponent: 0.5,
-    featureDepth: 1.05,
+    width: 1.5,
+    height: 1.7,
+    tumblehome: 0.55,
+    haunch: 1,
+    sillTuck: 0.86,
   },
   material: {
     color: "#f0f2f4",

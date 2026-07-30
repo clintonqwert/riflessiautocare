@@ -29,29 +29,34 @@ build time. Verified by grepping the production chunks.
 
 ## What each dial does
 
-### Form — rebuilds the mesh
+### Body — rebuilds the mesh
+
+The shape is a loft: a closed cross-section swept along a silhouette profile
+from nose to tail. Proportions are the front-engine coupe genre — long hood,
+cab-rearward greenhouse, fastback roofline, wide rear hips. No wheels: it reads
+as a design-studio clay buck, which is what it is — a surface for showing paint.
 
 | Value | Range | Effect |
 | --- | --- | --- |
-| `length` | 2.5 – 7 | Nose-to-tail. Longer reads sleeker, shorter reads like a pebble. |
-| `widthScale` | 0.6 – 2.2 | Overall width. Past ~1.8 it stops reading as automotive. |
-| `crownHeight` | 0.3 – 1.8 | Dome height. The single biggest silhouette change. |
-| `edgeHeight` | 0 – 0.8 | The vertical wall at the base. 0 removes the rim entirely. |
-| `archExponent` | 0.5 – 1.6 | How the dome meets its outline. Low values drop away almost vertically for a hard shoulder; **above 1.2** it flattens toward a tabletop. Currently shipped at the minimum, 0.5, for a deliberately sharp edge — measured at a 6.8:1 slope where 0.9 gives 2:1. The geometry check flags anything past 8:1. |
-| `featureDepth` | 0 – 2.5 | Scales all five scoops and the haunch. 0 = plain dome, ~1 = shipped, 2+ = heavily sculpted. |
+| `length` | 3 – 9 | Nose to tail. |
+| `width` | 0.6 – 2.6 | Overall width. |
+| `height` | 0.8 – 2.6 | Scales the whole silhouette, so the roofline keeps its shape as the car gets taller. |
+| `tumblehome` | 0 – 1 | How far the glasshouse pulls in above the belt line. 0 = glass flush with the flanks, 1 = a strongly tapered cabin. |
+| `haunch` | 0 – 2.5 | Extra width over the rear axle. 0 removes the hips and the car reads as a hatchback. |
+| `sillTuck` | 0.5 – 1 | 1 = slab sided; lower pulls the sills under so the body appears to float. |
 
-> **After changing anything under Form, re-run the camera-path check.** Growing
-> the shape can put a camera pose inside the mesh, and because the solid renders
-> front-faces only the form simply vanishes at that point in the scroll rather
-> than looking obviously broken. The `craft` act is the tightest pose in the
-> sequence and will always fail first. The mesh centres itself vertically from
-> its own bounds, so `crownHeight` alone is safe; `length` and `widthScale` are
-> the risky ones.
+The silhouette itself — hood line, windscreen rake, roof peak, fastback fall —
+is the `SILHOUETTE` keyframe array in `car-silhouette-geometry.ts`, alongside
+`BODY_WIDTH`, `ROOF_WIDTH`, and `SHOULDER_HEIGHT`. Those four curves are the
+car. Editing them changes the model; nothing else needs to know.
 
-Individual scoop positions are the `FEATURES` array in
-`paint-tester-geometry.ts` — each is a Gaussian bump in (length, width) with a
-radius and an amplitude. Negative amplitude is a scoop. Not in the panel
-because five features × four numbers is twenty sliders.
+> **After changing anything under Body, re-run the camera-path check.** Growing
+> the car can put a camera pose inside the mesh, and because the body renders
+> front-faces only it simply vanishes at that point in the scroll rather than
+> looking obviously broken. The `craft` act rakes across the rear haunch and is
+> the tightest pose in the sequence — it will always fail first. The mesh
+> centres itself vertically from its own bounds, so `height` alone is safe;
+> `length` and `width` are the risky ones.
 
 ### Material — applies next frame
 
@@ -102,20 +107,20 @@ material.metalness      0.35    material.envIntensityCoated  1.1
 light.key               7.5     light.fill                0.5
 ```
 
-**Sculpted** — deeper scoops and a taller crown; more obviously a display form.
+**Wide-body** — hips and shoulders pushed out, cabin pinched in.
 
 ```
-form.crownHeight  1.25    form.featureDepth  1.8
-form.archExponent 0.8     form.edgeHeight    0.34
-camera.fov        44
+form.width       1.85   form.haunch     2.0
+form.tumblehome  0.8    form.sillTuck   0.78
+camera.fov       44
 ```
 
-**Long and low** — sleeker, more like a fastback profile.
+**Long and low** — stretched and flattened, closer to a GT than a compact coupe.
 
 ```
-form.length        5.6    form.widthScale   1.12
-form.crownHeight   0.72   form.archExponent 1.05
-camera.fov         30
+form.length  7.8    form.height     1.35
+form.width   1.45   form.tumblehome 0.45
+camera.fov   30
 ```
 
 **Maximum contrast** — hard key, near-zero fill, bright backdrop.
