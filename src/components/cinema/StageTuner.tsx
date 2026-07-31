@@ -287,7 +287,11 @@ export function StageTuner() {
   return (
     <aside
       aria-label="Stage tuner (development only)"
-      className="fixed bottom-4 right-4 z-[200] max-h-[88vh] w-[300px] overflow-y-auto rounded-md border border-line-strong bg-surface/95 p-3 text-fg shadow-lg backdrop-blur"
+      // Lenis hijacks wheel events for the whole page, which otherwise swallows
+      // scrolling inside this panel and moves the sequence instead. This is its
+      // documented opt-out.
+      data-lenis-prevent
+      className="fixed bottom-4 right-4 z-[200] max-h-[88vh] w-[300px] overflow-y-auto overscroll-contain rounded-md border border-line-strong bg-surface/95 p-3 text-fg shadow-lg backdrop-blur"
     >
       <div className="mb-3 flex items-center justify-between gap-2">
         <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-accent">
@@ -300,11 +304,25 @@ export function StageTuner() {
 
       <CameraEditor onChange={() => forceRender((n) => n + 1)} buttonClass={button} />
 
+      {/*
+        Collapsible, because the full panel is nearly three screens tall and a
+        design session lives in one or two groups at a time. <details> rather
+        than state: native, keyboard accessible, and it remembers nothing —
+        which is right, since the useful default is everything open.
+      */}
       {SECTIONS.map((section) => (
-        <section key={section.title} className="mb-4">
-          <h2 className="font-sans text-xs font-semibold text-fg">
-            {section.title}
-          </h2>
+        <details key={section.title} open className="group mb-3">
+          <summary className="flex cursor-pointer list-none items-center justify-between rounded-sm py-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent [&::-webkit-details-marker]:hidden">
+            <h2 className="font-sans text-xs font-semibold text-fg">
+              {section.title}
+            </h2>
+            <span
+              aria-hidden
+              className="text-[10px] text-muted transition-transform group-open:rotate-90"
+            >
+              ▸
+            </span>
+          </summary>
           {section.note && (
             <p className="mt-0.5 mb-2 text-[10px] leading-snug text-muted">
               {section.note}
@@ -360,7 +378,7 @@ export function StageTuner() {
               </div>
             );
           })}
-        </section>
+        </details>
       ))}
 
       <div className="sticky bottom-0 flex gap-2 border-t border-line bg-surface/95 pt-2">

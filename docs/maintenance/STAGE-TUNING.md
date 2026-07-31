@@ -12,6 +12,14 @@ npm run dev            # then open http://localhost:3000
 The panel appears bottom-right. Drag, then **Copy values** and paste the result
 over `STAGE_DEFAULTS`. **Reset** restores the shipped values.
 
+**Any fixed overlay on this page needs `data-lenis-prevent`.** Lenis hijacks
+wheel events for the whole document, so without it a scrollable panel does
+nothing and the page scrolls underneath instead. The tuner carries it; so must
+anything similar added later.
+
+Sections collapse — the full panel is nearly three screens tall, and a session
+usually lives in one or two groups.
+
 **If the panel does not appear**, the 3D stage is not active — the panel is
 only useful alongside it. `capability.ts` requires all of:
 
