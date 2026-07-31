@@ -85,8 +85,8 @@ const acts: CinemaAct[] = [
     // sequence, so it is the first to clip if the body is widened. Re-run the
     // camera-path check after changing `form` in stage-config.ts.
     pose: {
-      position: [2.9, 0.55, 3.35],
-      target: [1.6, -0.31, 1.0],
+      position: [3.15, 0.7, 3.35],
+      target: [1.85, 0.04, 0.9],
       exposure: 1.18,
       finish: 0.62,
     },

@@ -45,13 +45,17 @@ type Control = RangeControl | ColorControl;
 const SECTIONS: { title: string; note: string; controls: Control[] }[] = [
   {
     title: "Body",
-    note: "Rebuilds the mesh. Widening it can push a camera inside — see the note in STAGE-TUNING.md.",
+    note: "Overall dimensions in scene units. A coupe sits near 6.6 × 2.8 × 2.0.",
     controls: [
       { kind: "range", group: "form", key: "length", label: "Length", min: 3, max: 9, step: 0.05 },
-      { kind: "range", group: "form", key: "width", label: "Width", min: 0.6, max: 2.6, step: 0.02 },
+      { kind: "range", group: "form", key: "width", label: "Width", min: 1.2, max: 4.2, step: 0.02 },
       {
-        kind: "range", group: "form", key: "height", label: "Height", min: 0.8, max: 2.6, step: 0.02,
-        hint: "Scales the whole silhouette — the roofline keeps its shape",
+        kind: "range", group: "form", key: "height", label: "Height", min: 1, max: 3.2, step: 0.02,
+        hint: "Roughly 0.31 of length on a real coupe — lower reads faster",
+      },
+      {
+        kind: "range", group: "form", key: "wheelSize", label: "Wheel size", min: 0.6, max: 1.4, step: 0.01,
+        hint: "1 fills the arches; larger reads more aggressive",
       },
       {
         kind: "range", group: "form", key: "tumblehome", label: "Tumblehome", min: 0, max: 1, step: 0.01,

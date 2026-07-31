@@ -11,15 +11,16 @@ import { NERO } from "@/lib/design-tokens";
 
 export interface StageConfig {
   form: {
-    /** Nose-to-tail length in scene units. */
-    length: number;
-    /** Overall width multiplier. */
-    width: number;
     /**
-     * Overall height multiplier. Scales the whole silhouette, so the car gets
-     * taller without the roofline losing its shape.
+     * Overall dimensions in scene units — literal, not multipliers. Every
+     * profile curve is normalised against these, so a real car's proportions
+     * can be dialled in directly. A coupe sits near 6.6 × 2.8 × 2.0.
      */
+    length: number;
+    width: number;
     height: number;
+    /** Wheel and tyre scale. 1 fills the arches. */
+    wheelSize: number;
     /**
      * How far the greenhouse pulls in above the belt line. 0 = glass sits flush
      * with the flanks, 1 = a strongly tapered cabin.
@@ -66,12 +67,15 @@ export interface StageConfig {
 
 export const STAGE_DEFAULTS: StageConfig = {
   form: {
+    // Real coupe proportions: width 0.42 of length, height 0.31, wheelbase
+    // 0.62. Getting these right is most of what makes it read as a car.
     length: 6.65,
-    width: 1.5,
-    height: 1.7,
-    tumblehome: 0.55,
+    width: 2.78,
+    height: 2.04,
+    wheelSize: 1,
+    tumblehome: 0.45,
     haunch: 1,
-    sillTuck: 0.86,
+    sillTuck: 0.88,
   },
   material: {
     color: "#f0f2f4",
@@ -81,16 +85,16 @@ export const STAGE_DEFAULTS: StageConfig = {
     envIntensityCoated: 2.3,
   },
   light: {
-    key: 6.5,
+    key: 10.4,
     sweepLeft: 4.2,
-    sweepRight: 2.6,
-    bronzeRim: 4.8,
-    fill: 0.3,
+    sweepRight: 4.4,
+    bronzeRim: 8.2,
+    fill: 0.85,
     keyColor: "#fffaf2",
     bronzeColor: NERO.accent,
   },
-  camera: { fov: 38 },
-  backdrop: { lift: 82 },
+  camera: { fov: 30 },
+  backdrop: { lift: 86 },
 };
 
 export function cloneStageConfig(config: StageConfig = stageConfig): StageConfig {

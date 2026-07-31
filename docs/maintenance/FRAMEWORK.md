@@ -126,8 +126,8 @@ wiring.
 
 Two things deliberately stay out of the panel:
 
-- **The silhouette curves** — `SILHOUETTE`, `BODY_WIDTH`, `ROOF_WIDTH`, and
-  `SHOULDER_HEIGHT` in `car-silhouette-geometry.ts`. Those four keyframe arrays
+- **The silhouette curves** — `SILHOUETTE`, `ROCKER`, `BODY_WIDTH`,
+  `ROOF_WIDTH`, and `SHOULDER_HEIGHT` in `car-silhouette-geometry.ts`. Those five keyframe arrays
   are the car; the panel exposes overall proportions instead.
 - **The seven camera poses** — `src/lib/content/cinema.ts`. Those are content,
   not look: changing them changes the story. Re-run the camera-path check after

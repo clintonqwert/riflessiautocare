@@ -5,7 +5,10 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, Lightformer } from "@react-three/drei";
 import { MathUtils, Vector3, type MeshPhysicalMaterial } from "three";
 import { getOpeningPose } from "@/lib/content/cinema";
-import { createCarSilhouetteGeometry } from "./car-silhouette-geometry";
+import {
+  createCarBodyGeometry,
+  createWheelsGeometry,
+} from "./car-silhouette-geometry";
 import { createSampledPose, samplePose } from "./pose";
 import { stageProgress } from "./scroll-progress";
 import {
@@ -110,40 +113,59 @@ function CarBody({
   form: StageConfig["form"];
   material: StageConfig["material"];
 }) {
-  // Rebuilt exactly when a form slider moves. ~19k vertices of pure
-  // arithmetic, cheap enough to regenerate on drag.
-  const geometry = useMemo(() => createCarSilhouetteGeometry(form), [form]);
-  useEffect(() => () => geometry.dispose(), [geometry]);
+  // Rebuilt exactly when a form slider moves. Pure arithmetic, cheap enough to
+  // regenerate on drag.
+  const body = useMemo(() => createCarBodyGeometry(form), [form]);
+  const wheels = useMemo(() => createWheelsGeometry(form), [form]);
+  useEffect(() => () => body.dispose(), [body]);
+  useEffect(() => () => wheels.dispose(), [wheels]);
 
-  // The mesh is built sitting on y=0, so it has to be lifted to sit around the
-  // origin the camera poses aim at. Derived from its own bounds rather than
-  // hard-coded: change crownHeight in the tuner and the framing still holds.
+  // Both meshes are built sitting on y=0, so the pair has to be lifted to sit
+  // around the origin the camera poses aim at. Derived from the body's own
+  // bounds rather than hard-coded: resize in the tuner and framing still holds.
   const centreY = useMemo(() => {
-    geometry.computeBoundingBox();
-    const box = geometry.boundingBox;
+    body.computeBoundingBox();
+    const box = body.boundingBox;
     return box ? -(box.max.y + box.min.y) / 2 : 0;
-  }, [geometry]);
+  }, [body]);
 
   return (
-    <mesh geometry={geometry} position={[0, centreY, 0]}>
-      {/*
-        Automotive paint is pigment under a clear coat, not bare metal — so the
-        base stays dark and mid-metalness while the clearcoat layer does the
-        reflecting. That separation is what lets the coating beat in act six
-        read as a real change in finish.
+    <group position={[0, centreY, 0]}>
+      <mesh geometry={body}>
+        {/*
+          Automotive paint is pigment under a clear coat, not bare metal — so
+          the base colour stays flat while the clearcoat layer does the
+          reflecting. That separation is what lets the coating beat in act six
+          read as a real change in finish.
 
-        The solid is closed and correctly wound, so it renders front-faces only.
+          The solid is closed and correctly wound, so it renders front faces
+          only.
+        */}
+        <meshPhysicalMaterial
+          ref={materialRef}
+          color={material.color}
+          metalness={material.metalness}
+          roughness={material.roughnessBare}
+          clearcoat={CLEARCOAT_RANGE[0]}
+          clearcoatRoughness={CLEARCOAT_ROUGHNESS_RANGE[0]}
+          envMapIntensity={ENV_INTENSITY_BARE}
+        />
+      </mesh>
+
+      {/*
+        Wheels are deliberately near-black and matte. The tonal break against
+        the body is doing as much work as the geometry — it is what makes the
+        arches read, and with them the whole silhouette.
       */}
-      <meshPhysicalMaterial
-        ref={materialRef}
-        color={material.color}
-        metalness={material.metalness}
-        roughness={material.roughnessBare}
-        clearcoat={CLEARCOAT_RANGE[0]}
-        clearcoatRoughness={CLEARCOAT_ROUGHNESS_RANGE[0]}
-        envMapIntensity={ENV_INTENSITY_BARE}
-      />
-    </mesh>
+      <mesh geometry={wheels}>
+        <meshStandardMaterial
+          color="#0d0d10"
+          metalness={0.1}
+          roughness={0.62}
+          envMapIntensity={0.35}
+        />
+      </mesh>
+    </group>
   );
 }
 
