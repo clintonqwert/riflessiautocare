@@ -116,8 +116,16 @@ export function SiteFooter() {
           only in docs/maintenance/STAGE-MODEL.md.
         */}
         <p className="mt-4 text-[11px] leading-relaxed text-muted/70">
-          Homepage 3D model &ldquo;Car Concept&rdquo; by Eric Chadwick for
-          Darmstadt Graphics Group, used under{" "}
+          Homepage 3D model{" "}
+          <a
+            href="https://skfb.ly/6Z9tX"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 transition-colors hover:text-accent"
+          >
+            &ldquo;Lamborghini Centenario LP-770 Interior SDC&rdquo;
+          </a>{" "}
+          by SDC PERFORMANCE&trade;, used under{" "}
           <a
             href="https://creativecommons.org/licenses/by/4.0/"
             target="_blank"
@@ -126,7 +134,8 @@ export function SiteFooter() {
           >
             CC BY 4.0
           </a>
-          . Modified: interior, textures, and logos removed.
+          . Modified: textures, cabin trim, and badging removed; materials
+          reassigned.
         </p>
       </div>
     </footer>

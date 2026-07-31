@@ -32,8 +32,15 @@ import fs from "node:fs";
 import path from "node:path";
 import { NodeIO } from "@gltf-transform/core";
 import { ALL_EXTENSIONS, EXTMeshoptCompression } from "@gltf-transform/extensions";
-import { dedup, prune, quantize, reorder, weld } from "@gltf-transform/functions";
-import { MeshoptEncoder } from "meshoptimizer";
+import {
+  dedup,
+  prune,
+  quantize,
+  reorder,
+  simplifyPrimitive,
+  weld,
+} from "@gltf-transform/functions";
+import { MeshoptEncoder, MeshoptSimplifier } from "meshoptimizer";
 
 const input = process.argv[2];
 const output = process.argv[3] ?? "public/models/car-concept.glb";
@@ -47,12 +54,34 @@ if (!fs.existsSync(input)) {
   process.exit(1);
 }
 
-/** Never visible from outside a closed car. */
+/** Never visible from outside a closed car — matched on node name. */
 const DROP = /^Interior|Wiper|Engine|Seat|Pedal|Dashboard|Steering|Floormat/i;
+
+/**
+ * Matched on *material* name, because plenty of models name their nodes
+ * `Object_41` and put all the meaning in materials.
+ *
+ * Two groups: cabin trim that is never seen from outside, and manufacturer
+ * badging. The badging is not optional — a CC licence covers the modeller's
+ * work, never the marque's trademarks, so any mesh that is a logo or a model
+ * name goes.
+ */
+const DROP_MATERIALS =
+  /^(CUIR|leather|Plastic_Dash|Seat_?Belt|Display|Vents|Steering|LOGO|EMBLEM|BADGE|CENTENARIO|Interior)/i;
+
+/**
+ * Materials worth decimating hard: high vertex counts spent on things nobody
+ * looks at. Tyre tread is the usual offender — one model spent 63% of its
+ * entire budget on it.
+ */
+const DECIMATE_MATERIALS = /^(pneu|tire|tyre|tread)/i;
+const DECIMATE_RATIO = 0.12;
+
 /** The stage recolours anything matching this — see CarModel.tsx. */
-const PAINT = /^Paint|body.*paint|carpaint/i;
+const PAINT = /^Paint|body.*colou?r|carpaint|Carbon_R/i;
 
 await MeshoptEncoder.ready;
+await MeshoptSimplifier.ready;
 
 const io = new NodeIO()
   .registerExtensions(ALL_EXTENSIONS)
@@ -71,6 +100,40 @@ for (let pass = 0; pass < 8; pass++) {
       node.dispose();
       dropped++;
     }
+  }
+}
+
+// Cabin trim and badging, matched on material.
+let droppedPrims = 0;
+let droppedVerts = 0;
+for (const mesh of root.listMeshes()) {
+  for (const prim of mesh.listPrimitives()) {
+    const name = prim.getMaterial()?.getName() ?? "";
+    if (!DROP_MATERIALS.test(name)) continue;
+    droppedVerts += prim.getAttribute("POSITION")?.getCount() ?? 0;
+    prim.dispose();
+    droppedPrims++;
+  }
+}
+
+// Decimate the vertex sinks nobody looks at, before welding merges them into
+// their neighbours.
+let decimatedFrom = 0;
+let decimatedTo = 0;
+for (const mesh of root.listMeshes()) {
+  for (const prim of mesh.listPrimitives()) {
+    const name = prim.getMaterial()?.getName() ?? "";
+    if (!DECIMATE_MATERIALS.test(name)) continue;
+    const before = prim.getAttribute("POSITION")?.getCount() ?? 0;
+    if (before < 4000) continue;
+    simplifyPrimitive(prim, {
+      simplifier: MeshoptSimplifier,
+      ratio: DECIMATE_RATIO,
+      error: 0.01,
+      lockBorder: false,
+    });
+    decimatedFrom += before;
+    decimatedTo += prim.getAttribute("POSITION")?.getCount() ?? 0;
   }
 }
 
@@ -105,7 +168,10 @@ const after = fs.statSync(output).size;
 const mb = (n) => (n / 1048576).toFixed(2);
 
 console.log(`\n  ${input} → ${output}`);
-console.log(`  dropped ${dropped} hidden nodes, ${textures} textures`);
+console.log(`  dropped ${dropped} hidden nodes, ${droppedPrims} trim/badge meshes (${droppedVerts.toLocaleString()} verts), ${textures} textures`);
+if (decimatedFrom) {
+  console.log(`  decimated tyres ${decimatedFrom.toLocaleString()} → ${decimatedTo.toLocaleString()} verts`);
+}
 console.log(`  ${verts.toLocaleString()} verts · ${root.listMeshes().length} meshes · ${materials.length} materials`);
 console.log(`  ${mb(before)} MB → ${mb(after)} MB\n`);
 

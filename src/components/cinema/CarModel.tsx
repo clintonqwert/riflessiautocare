@@ -29,8 +29,23 @@ import type { StageConfig } from "./stage-config";
 
 export const CAR_MODEL_URL = "/models/car-concept.glb";
 
-/** Materials whose name matches this are body paint and get replaced. */
-const PAINT_MATERIAL = /^Paint/i;
+/**
+ * Material-name patterns, matched in order. Marketplace models name things
+ * inconsistently — one calls the body "Paint 1 Carmine", another "Carbon_R",
+ * another "Body_Colour" on a 31-vertex offcut — so these cover the naming
+ * conventions of the assets that have actually been through here.
+ *
+ * `prepare-car-model.mjs` reports which materials it found; if a new asset's
+ * body is not detected, add its name here and to PAINT in that script.
+ */
+const PAINT_MATERIAL = /^Paint|^Carbon_R$|body.*colou?r|carpaint/i;
+const GLASS_MATERIAL = /glass|window|^GLS/i;
+const RIM_MATERIAL = /^Rim|JANTE|chrome|Metal_C|mirror|miror/i;
+const TYRE_MATERIAL = /tire|tyre|^pneu/i;
+const HEAD_LAMP = /headlight|LIGT_BLC/i;
+const BRAKE_LAMP = /brakelight|LIGT_RED/i;
+const SIGNAL_LAMP = /signallight/i;
+const DARK_TRIM = /mechanical|brake|disc|interior|license|plastique|^PLAS|DTL_FER|Carbon_M/i;
 
 interface CarModelProps {
   paintRef: RefObject<MeshPhysicalMaterial | null>;
@@ -166,17 +181,16 @@ export function CarModel({
       const current = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
       const name = current?.name ?? "";
 
+      // Order matters: tyres before rims, since "tire" can co-occur with metal
+      // naming, and lamps before the catch-all dark trim.
       if (PAINT_MATERIAL.test(name)) mesh.material = paint;
-      else if (/glass|window/i.test(name)) mesh.material = trimMaterials.glass;
-      else if (/^Rim/i.test(name)) mesh.material = trimMaterials.rim;
-      else if (/tire|tyre/i.test(name)) mesh.material = trimMaterials.tyre;
-      else if (/headlight/i.test(name)) mesh.material = trimMaterials.head;
-      else if (/brakelight/i.test(name)) mesh.material = trimMaterials.brake;
-      else if (/signallight/i.test(name)) mesh.material = trimMaterials.signal;
-      else if (/mirror/i.test(name)) mesh.material = trimMaterials.rim;
-      else if (/mechanical|brake|disc|interior|license/i.test(name)) {
-        mesh.material = trimMaterials.dark;
-      }
+      else if (GLASS_MATERIAL.test(name)) mesh.material = trimMaterials.glass;
+      else if (TYRE_MATERIAL.test(name)) mesh.material = trimMaterials.tyre;
+      else if (HEAD_LAMP.test(name)) mesh.material = trimMaterials.head;
+      else if (BRAKE_LAMP.test(name)) mesh.material = trimMaterials.brake;
+      else if (SIGNAL_LAMP.test(name)) mesh.material = trimMaterials.signal;
+      else if (RIM_MATERIAL.test(name)) mesh.material = trimMaterials.rim;
+      else if (DARK_TRIM.test(name)) mesh.material = trimMaterials.dark;
     });
   }, [scene, paint, trimMaterials]);
 

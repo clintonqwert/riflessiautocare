@@ -4,18 +4,27 @@
 
 ## Provenance and licence
 
-**"Car Concept"**, © 2024 Darmstadt Graphics Group GmbH, model and textures by
-Eric Chadwick. Licensed **[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)**.
-Source: [KhronosGroup/glTF-Sample-Assets](https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/CarConcept).
+**"Lamborghini Centenario LP-770 Interior SDC"** (https://skfb.ly/6Z9tX) by
+**SDC PERFORMANCE™**, licensed **[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)**.
 
 **CC BY requires attribution that reaches visitors**, so the credit is rendered
 in the site footer, not only here. If the model is ever replaced, update both
-`SiteFooter.tsx` and this file together — or remove the credit if the
-replacement does not require one.
+`SiteFooter.tsx` and this file together.
 
-The original also carried Khronos and 3D Commerce logos and a licence plate,
-which are trademarks rather than CC-licensed content. Those were removed during
-preparation, along with every texture, so nothing trademarked ships.
+### Trademarks
+
+A CC licence covers the modeller's work. It does not, and cannot, cover
+Lamborghini's marks or design rights — no modeller is able to license those.
+
+Preparation deletes every mesh that *is* a trademark: the `LOGO`,
+`CENTENARIO`, and `Steering_Wheel_Logo` materials, plus all textures, which
+takes any baked-in badging with them. What remains is the vehicle's shape,
+which is a recognisable Lamborghini. Using it is a business decision the owner
+has taken knowingly; it is recorded here so nobody has to rediscover the
+question later.
+
+The marque-neutral alternative — a concept car with no manufacturer identity —
+is in git history if that trade ever needs revisiting.
 
 ## Why a licensed model rather than procedural geometry
 
@@ -26,23 +35,25 @@ The procedural approach is preserved in git history if it is ever wanted back.
 
 ## How it was prepared
 
-Reduced from **11.2 MB to 1.14 MB** (0.86 MB gzipped) with
-[glTF-Transform](https://gltf-transform.dev):
+Reduced from **19.07 MB to 2.05 MB** by `scripts/prepare-car-model.mjs`:
 
-1. **Dropped the interior and the wipers.** Seats, dashboard, pedals, steering,
-   floor, cage — none of it is visible from outside, and the wipers alone were
-   30k vertices. Only leaf nodes were disposed; disposing a parent takes its
-   children with it and empties the scene.
-2. **Stripped all 14 textures.** The paint material is generated and animated in
-   code, and glass and lights only need flat colours. This also removed the
-   trademarked logos and plate.
-3. `weld()`, `dedup()`, `prune()`, `reorder()`, `quantize()`, then
-   **`EXT_meshopt_compression`** — which halved it again, from 2.3 MB to
-   1.14 MB, with no geometry removed.
+1. **Dropped cabin trim and badging by material name.** This asset names every
+   node `Object_41`, so node-name matching finds nothing — all the meaning is in
+   the materials (`CUIR`, `Plastic_Dash`, `Seat_Belt`, `LOGO`, `CENTENARIO`).
+2. **Decimated the tyres**, which were **63% of the entire model** — 205k
+   vertices of tread, reduced to 96k. Nothing else is simplified; decimating
+   bodywork reads as unfinished long before it saves anything useful.
+3. **Stripped all 7 textures.** Every material is assigned from `stage-config.ts`.
+4. `weld()`, `dedup()`, `prune()`, `reorder()`, `quantize()`, then
+   **`EXT_meshopt_compression`**.
 
-Roughly 99k vertices and 23 materials remain. Deliberately **not** simplified:
-decimating the mesh made an already-sparse model look worse, and meshopt gets
-the size down without touching detail.
+Roughly 206k vertices and 35 materials remain.
+
+The body is the `Carbon_R` material — despite the name, its bounding box spans
+the whole car. `Body_Colour` exists but carries **31 vertices**, so it is some
+offcut rather than the paint. This is exactly why the prep script reports which
+materials it matched: guessing from names alone would have silently broken
+recolouring.
 
 `useGLTF` decodes meshopt with the decoder bundled in `three-stdlib`, so
 nothing extra is fetched. `next.config.ts` serves `/models/*` with a one-year
