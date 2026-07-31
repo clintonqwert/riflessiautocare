@@ -104,28 +104,41 @@ length the array is.
    assistive tech and find-in-page behave best with.
 7. **The stage pauses off screen.** An IntersectionObserver flips `frameloop`
    to `never`; the page continues for several sections below the sequence.
-8. **No asset downloads.** Geometry is generated in `paint-tester-geometry.ts`
-   and the environment is baked from `Lightformer` planes. No GLB, no HDR,
-   nothing licensed, nothing traced from a real manufacturer's bodywork.
-9. **Winding is load-bearing.** The solid renders front-faces only, so a
-   reversed triangle is an invisible hole and an inverted normal is a surface
-   lit from underneath. Both are silent in a screenshot. Keep the orientation
-   assertions in any geometry change.
+8. **One asset, licensed and documented.** The car is a CC BY 4.0 model
+   (`docs/maintenance/STAGE-MODEL.md`); the environment is still baked from
+   `Lightformer` planes, so no HDR is fetched. The attribution the licence
+   requires is rendered in the footer. Three procedural attempts preceded this
+   and all read as a blob — the honest lesson is that a convincing car is
+   modelling work, not parameter tuning.
+9. **Look at it.** Three procedural attempts at the car passed every numeric
+   check — normals, proportions, no tears — and all three looked wrong. A
+   geometry harness measures whether a mesh is *valid*, never whether it is
+   *good*. The scene can be screenshotted headlessly (`STAGE-TUNING.md`); do
+   that before claiming a visual change works.
 
 ### Tuning the look
 
-Three dials, deliberately separated so each can be adjusted without touching
-the others:
+Everything lives in `stage-config.ts` as `STAGE_DEFAULTS`, and a dev-only
+panel (`StageTuner`) drags them live — `npm run dev`, panel bottom-right,
+"Copy values" to paste back. Full reference and preset starting points:
+**`docs/maintenance/STAGE-TUNING.md`**.
 
-- **Form** — `FEATURES` in `paint-tester-geometry.ts`: Gaussian bumps in
-  (length, width). Negative amplitudes are scoops. This array is the shape's
-  personality.
-- **Light** — `RIG` in `PaintStage.tsx`. The key-to-fill ratio is what makes
-  the form read as sculpted rather than as an evenly grey blob; raising `fill`
-  is the fastest way to flatten it.
-- **Separation** — the `stage-backdrop` utility in `globals.css`. The canvas
-  renders with alpha, so the backdrop is pure CSS and costs nothing to change.
-  The form stays near-black and separates on specular, not base colour.
+The panel never reaches production: its import sits behind a
+`process.env.NODE_ENV === "development"` branch the bundler resolves at build
+time. Confirm with a grep over `.next/static/chunks` after any change to that
+wiring.
+
+Two things deliberately stay out of the panel:
+
+- **The car's shape** — fixed by the model. The panel exposes only its scale.
+- **The seven camera poses** — `src/lib/content/cinema.ts`. Those are content,
+  not look: changing them changes the story. Re-run the camera-path check after
+  editing so the camera never ends up inside the mesh.
+
+Render-time values flow through React as an immutable snapshot
+(`useStageSnapshot`); per-frame animation reads the live object directly in
+`StageDirector`. Keep that split — putting per-frame values into state would
+put the whole tree in the animation loop.
 
 ### Client JS census (updated)
 

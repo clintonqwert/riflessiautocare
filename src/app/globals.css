@@ -100,7 +100,12 @@
   background:
     radial-gradient(
       58% 54% at 52% 46%,
-      color-mix(in oklab, var(--color-overlay) 82%, #ffffff) 0%,
+      color-mix(
+          in oklab,
+          var(--color-overlay) var(--stage-backdrop-lift, 82%),
+          #ffffff
+        )
+        0%,
       var(--color-overlay) 32%,
       var(--color-raised) 60%,
       var(--color-surface) 100%

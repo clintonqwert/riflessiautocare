@@ -1,40 +1,55 @@
 "use client";
 
-import { useEffect, useMemo, useRef, type RefObject } from "react";
+import {
+  Suspense,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type RefObject,
+} from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, Lightformer } from "@react-three/drei";
 import { MathUtils, Vector3, type MeshPhysicalMaterial } from "three";
-import { NERO } from "@/lib/design-tokens";
 import { getOpeningPose } from "@/lib/content/cinema";
-import { createPaintTesterGeometry } from "./paint-tester-geometry";
+import { CarModel } from "./CarModel";
 import { createSampledPose, samplePose } from "./pose";
 import { stageProgress } from "./scroll-progress";
-
-/** Bare corrected paint → cured ceramic coating, as the `finish` value climbs. */
-const FINISH_RANGE = {
-  roughness: [0.42, 0.045] as const,
-  clearcoat: [0.35, 1] as const,
-  clearcoatRoughness: [0.34, 0.015] as const,
-  envMapIntensity: [0.9, 2.3] as const,
-};
+import {
+  cloneStageConfig,
+  stageConfig,
+  subscribeToStageConfig,
+  type StageConfig,
+} from "./stage-config";
 
 /**
- * Lighting rig intensities — the contrast dial, all in one place.
- *
- * The body stays near-black, so separation from the backdrop comes from
- * specular rather than base colour. A high key-to-fill ratio is what gives the
- * form a bright edge and a dark core instead of an evenly grey blob.
+ * Values that are not worth exposing in the tuning panel — the clearcoat layer
+ * tracks roughness closely enough that a separate pair of dials adds noise
+ * rather than control.
  */
-const RIG = {
-  key: 6.5,
-  sweepLeft: 4.2,
-  sweepRight: 2.6,
-  bronzeRim: 4.8,
-  /** Deliberately low — raising this is what flattens the whole image. */
-  fill: 0.3,
-};
+const CLEARCOAT_RANGE = [0.35, 1] as const;
+const CLEARCOAT_ROUGHNESS_RANGE = [0.34, 0.015] as const;
+const ENV_INTENSITY_BARE = 0.9;
 
 type MaterialRef = RefObject<MeshPhysicalMaterial | null>;
+
+/**
+ * An immutable snapshot of the config for render-time use. The live object is
+ * mutated in place, which React cannot see — taking a copy on every change
+ * gives components real values with real identities to depend on.
+ *
+ * In production nothing calls `setStageValue`, so this resolves once and never
+ * updates again. Per-frame animation still reads the live object directly in
+ * `StageDirector`; that is not render, so it needs no snapshot.
+ */
+function useStageSnapshot(): StageConfig {
+  const [snapshot, setSnapshot] = useState(cloneStageConfig);
+  useEffect(
+    () => subscribeToStageConfig(() => setSnapshot(cloneStageConfig())),
+    [],
+  );
+  return snapshot;
+}
 
 /**
  * The single render-loop owner. Camera, exposure, and material all read from
@@ -67,50 +82,30 @@ function StageDirector({ materialRef }: { materialRef: MaterialRef }) {
       alpha,
     );
 
+    // Read live so the tuning panel's material sliders apply on the next frame
+    // without rebuilding anything.
+    const { material: cfg } = stageConfig;
     const material = materialRef.current;
     if (material) {
       const f = sampled.finish;
-      material.roughness = MathUtils.lerp(...FINISH_RANGE.roughness, f);
-      material.clearcoat = MathUtils.lerp(...FINISH_RANGE.clearcoat, f);
-      material.clearcoatRoughness = MathUtils.lerp(
-        ...FINISH_RANGE.clearcoatRoughness,
-        f,
-      );
+      material.roughness = MathUtils.lerp(cfg.roughnessBare, cfg.roughnessCoated, f);
+      material.clearcoat = MathUtils.lerp(...CLEARCOAT_RANGE, f);
+      material.clearcoatRoughness = MathUtils.lerp(...CLEARCOAT_ROUGHNESS_RANGE, f);
       material.envMapIntensity = MathUtils.lerp(
-        ...FINISH_RANGE.envMapIntensity,
+        ENV_INTENSITY_BARE,
+        cfg.envIntensityCoated,
         f,
       );
+    }
+
+    const camera = state.camera;
+    if ("fov" in camera && camera.fov !== stageConfig.camera.fov) {
+      camera.fov = stageConfig.camera.fov;
+      camera.updateProjectionMatrix();
     }
   });
 
   return null;
-}
-
-function PaintTester({ materialRef }: { materialRef: MaterialRef }) {
-  const geometry = useMemo(() => createPaintTesterGeometry(), []);
-  useEffect(() => () => geometry.dispose(), [geometry]);
-
-  return (
-    <mesh geometry={geometry} position={[0, -0.55, 0]}>
-      {/*
-        Automotive paint is pigment under a clear coat, not bare metal — so the
-        base stays dark and mid-metalness while the clearcoat layer does the
-        reflecting. That separation is what lets the coating beat in act six
-        read as a real change in finish.
-
-        The solid is closed and correctly wound, so it renders front-faces only.
-      */}
-      <meshPhysicalMaterial
-        ref={materialRef}
-        color={NERO.raised}
-        metalness={0.65}
-        roughness={FINISH_RANGE.roughness[0]}
-        clearcoat={FINISH_RANGE.clearcoat[0]}
-        clearcoatRoughness={FINISH_RANGE.clearcoatRoughness[0]}
-        envMapIntensity={FINISH_RANGE.envMapIntensity[0]}
-      />
-    </mesh>
-  );
 }
 
 /**
@@ -120,22 +115,28 @@ function PaintTester({ materialRef }: { materialRef: MaterialRef }) {
  * crown and through the scoops as the camera travels, which is the brand's
  * whole motif. Intensities live in RIG.
  */
-function ShowroomRig() {
+function ShowroomRig({ light }: { light: StageConfig["light"] }) {
   return (
-    <Environment resolution={256} frames={1}>
+    // `frames={1}` bakes the environment once, so a light change has to remount
+    // the whole rig to take effect — hence keying on the values themselves.
+    <Environment
+      key={Object.values(light).join("|")}
+      resolution={256}
+      frames={1}
+    >
       {/* Overhead softbox — the key light. */}
       <Lightformer
         form="rect"
-        intensity={RIG.key}
+        intensity={light.key}
         position={[0, 6, 0]}
         target={[0, 0, 0]}
         scale={[10, 3, 1]}
-        color="#fffaf2"
+        color={light.keyColor}
       />
       {/* Long side strips — the travelling highlights. */}
       <Lightformer
         form="rect"
-        intensity={RIG.sweepLeft}
+        intensity={light.sweepLeft}
         position={[-6.5, 2.4, 2]}
         target={[0, 0, 0]}
         scale={[14, 1.2, 1]}
@@ -143,25 +144,25 @@ function ShowroomRig() {
       />
       <Lightformer
         form="rect"
-        intensity={RIG.sweepRight}
+        intensity={light.sweepRight}
         position={[6.5, 2, -1.5]}
         target={[0, 0, 0]}
         scale={[12, 1, 1]}
-        color={NERO.fg}
+        color={light.keyColor}
       />
       {/* Bronze rim — the brand accent, separating the form from the backdrop. */}
       <Lightformer
         form="rect"
-        intensity={RIG.bronzeRim}
+        intensity={light.bronzeRim}
         position={[2.5, 1.2, -6.5]}
         target={[0, 0, 0]}
         scale={[8, 1.4, 1]}
-        color={NERO.accent}
+        color={light.bronzeColor}
       />
       {/* Low fill so the underside reads as form rather than a void. */}
       <Lightformer
         form="rect"
-        intensity={RIG.fill}
+        intensity={light.fill}
         position={[0, -3.5, 2]}
         target={[0, 0, 0]}
         scale={[10, 6, 1]}
@@ -179,6 +180,7 @@ function ShowroomRig() {
 export default function PaintStage({ active }: { active: boolean }) {
   const materialRef = useRef<MeshPhysicalMaterial | null>(null);
   const opening = getOpeningPose();
+  const config = useStageSnapshot();
 
   return (
     <Canvas
@@ -188,7 +190,7 @@ export default function PaintStage({ active }: { active: boolean }) {
       dpr={[1, 1.75]}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       camera={{
-        fov: 38,
+        fov: config.camera.fov,
         near: 0.1,
         far: 80,
         position: [...opening.position] as [number, number, number],
@@ -197,8 +199,18 @@ export default function PaintStage({ active }: { active: boolean }) {
         gl.toneMappingExposure = opening.exposure;
       }}
     >
-      <ShowroomRig />
-      <PaintTester materialRef={materialRef} />
+      <ShowroomRig light={config.light} />
+      <Suspense fallback={null}>
+        <CarModel
+          paintRef={materialRef}
+          form={config.form}
+          material={config.material}
+          trim={config.trim}
+          clearcoat={CLEARCOAT_RANGE}
+          clearcoatRoughness={CLEARCOAT_ROUGHNESS_RANGE}
+          envIntensityBare={ENV_INTENSITY_BARE}
+        />
+      </Suspense>
       <StageDirector materialRef={materialRef} />
     </Canvas>
   );
