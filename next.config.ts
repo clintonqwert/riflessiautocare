@@ -16,6 +16,16 @@ const nextConfig: NextConfig = {
         source: "/(.*)",
         headers: httpHeaders,
       },
+      {
+        // The 3D model is content-addressed by filename and only ever replaced
+        // wholesale, so it can be cached hard. Without this it is revalidated
+        // on every visit, which is most of why the stage felt slow to appear.
+        source: "/models/:path*",
+        headers: [
+          ...httpHeaders,
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
     ];
   },
 };

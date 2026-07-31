@@ -26,7 +26,7 @@ The procedural approach is preserved in git history if it is ever wanted back.
 
 ## How it was prepared
 
-Reduced from **11.2 MB to 2.3 MB** (1.3 MB gzipped) with
+Reduced from **11.2 MB to 1.14 MB** (0.86 MB gzipped) with
 [glTF-Transform](https://gltf-transform.dev):
 
 1. **Dropped the interior and the wipers.** Seats, dashboard, pedals, steering,
@@ -36,9 +36,18 @@ Reduced from **11.2 MB to 2.3 MB** (1.3 MB gzipped) with
 2. **Stripped all 14 textures.** The paint material is generated and animated in
    code, and glass and lights only need flat colours. This also removed the
    trademarked logos and plate.
-3. `weld()`, `dedup()`, `prune()`, `quantize()`.
+3. `weld()`, `dedup()`, `prune()`, `reorder()`, `quantize()`, then
+   **`EXT_meshopt_compression`** — which halved it again, from 2.3 MB to
+   1.14 MB, with no geometry removed.
 
-Roughly 99k vertices and 23 materials remain.
+Roughly 99k vertices and 23 materials remain. Deliberately **not** simplified:
+decimating the mesh made an already-sparse model look worse, and meshopt gets
+the size down without touching detail.
+
+`useGLTF` decodes meshopt with the decoder bundled in `three-stdlib`, so
+nothing extra is fetched. `next.config.ts` serves `/models/*` with a one-year
+immutable cache — without it the asset was revalidated on every visit, which
+was most of why the stage felt slow.
 
 The asset is only fetched by visitors who pass the capability gate in
 `capability.ts` — desktop, fine pointer, no reduced-motion preference, 4+ cores,
@@ -54,8 +63,15 @@ finds them.
 
 Meshes whose material name matches `/^Paint/i` get replaced with a single
 shared `MeshPhysicalMaterial`, which `StageDirector` animates from bare
-corrected paint to a cured coating across the scroll. Every other material —
-glass, lights, rims, tyres — is left as the model shipped it.
+corrected paint to a cured coating across the scroll.
+
+**Every other material is reassigned too**, from the `trim` block in
+`stage-config.ts`. Stripping the textures left glass, rims, tyres and lamps as
+flat placeholders — and the glass in particular kept its
+`KHR_materials_transmission` with no map, which renders it *completely
+invisible*. That is why the windshield appeared to be missing. It is now plain
+tinted transparency, which also skips three's separate transmission render
+pass, the most expensive thing this scene could do.
 
 ## Replacing it
 

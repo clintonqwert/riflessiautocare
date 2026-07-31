@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 import {
+  livePoses,
+  posesAsSource,
+  resetPoses,
   resetStageConfig,
+  setPoseValue,
   setStageValue,
   stageConfig,
   stageConfigAsSource,
@@ -65,6 +69,23 @@ const SECTIONS: { title: string; note: string; controls: Control[] }[] = [
     ],
   },
   {
+    title: "Trim",
+    note: "Everything on the car that is not paint.",
+    controls: [
+      { kind: "color", group: "trim", key: "glassColor", label: "Glass tint" },
+      {
+        kind: "range", group: "trim", key: "glassOpacity", label: "Glass opacity", min: 0, max: 1, step: 0.01,
+        hint: "0 is invisible glass — the bug that lost the windshield",
+      },
+      { kind: "range", group: "trim", key: "glassRoughness", label: "Glass roughness", min: 0, max: 0.4, step: 0.005 },
+      { kind: "color", group: "trim", key: "rimColor", label: "Rim colour" },
+      { kind: "range", group: "trim", key: "rimMetalness", label: "Rim metalness", min: 0, max: 1, step: 0.01 },
+      { kind: "range", group: "trim", key: "rimRoughness", label: "Rim roughness", min: 0, max: 1, step: 0.01 },
+      { kind: "color", group: "trim", key: "tyreColor", label: "Tyre colour" },
+      { kind: "range", group: "trim", key: "lightGlow", label: "Lamp glow", min: 0, max: 4, step: 0.05 },
+    ],
+  },
+  {
     title: "Light",
     note: "Re-bakes the environment map on each change.",
     controls: [
@@ -96,6 +117,120 @@ const SECTIONS: { title: string; note: string; controls: Control[] }[] = [
   },
 ];
 
+/**
+ * Per-act camera editor. This is the "scroll" surface: each act's camera
+ * position, aim, exposure and finish, with a jump button so the page scrolls to
+ * the act you are editing.
+ */
+function CameraEditor({
+  onChange,
+  buttonClass,
+}: {
+  onChange: () => void;
+  buttonClass: string;
+}) {
+  const [act, setAct] = useState(0);
+  const pose = livePoses[act];
+
+  const jump = () => {
+    document.getElementById(pose.id)?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const axis = (key: "position" | "target", i: 0 | 1 | 2, label: string) => (
+    <div key={`${key}${i}`} className="mt-1.5">
+      <label
+        htmlFor={`tune-${key}-${i}`}
+        className="flex items-baseline justify-between gap-2 text-[11px] text-muted"
+      >
+        <span>{label}</span>
+        <span className="font-mono text-[11px] text-fg">{pose[key][i].toFixed(2)}</span>
+      </label>
+      <input
+        id={`tune-${key}-${i}`}
+        type="range"
+        min={-26}
+        max={26}
+        step={0.05}
+        value={pose[key][i]}
+        onChange={(e) => {
+          setPoseValue(act, key, i, Number(e.target.value));
+          onChange();
+        }}
+        className="mt-1 w-full accent-[var(--color-accent)]"
+      />
+    </div>
+  );
+
+  const scalar = (key: "exposure" | "finish", label: string, max: number) => (
+    <div className="mt-1.5">
+      <label
+        htmlFor={`tune-${key}`}
+        className="flex items-baseline justify-between gap-2 text-[11px] text-muted"
+      >
+        <span>{label}</span>
+        <span className="font-mono text-[11px] text-fg">{pose[key].toFixed(2)}</span>
+      </label>
+      <input
+        id={`tune-${key}`}
+        type="range"
+        min={0}
+        max={max}
+        step={0.01}
+        value={pose[key]}
+        onChange={(e) => {
+          setPoseValue(act, key, Number(e.target.value));
+          onChange();
+        }}
+        className="mt-1 w-full accent-[var(--color-accent)]"
+      />
+    </div>
+  );
+
+  return (
+    <section className="mb-4">
+      <h2 className="font-sans text-xs font-semibold text-fg">Scroll &amp; camera</h2>
+      <p className="mt-0.5 mb-2 text-[10px] leading-snug text-muted">
+        Pick an act, jump to it, then frame it.
+      </p>
+
+      <div className="flex flex-wrap gap-1">
+        {livePoses.map((p, i) => (
+          <button
+            key={p.id}
+            type="button"
+            onClick={() => setAct(i)}
+            aria-pressed={i === act}
+            className={`rounded-sm border px-1.5 py-0.5 text-[10px] transition-colors ${
+              i === act
+                ? "border-accent bg-accent text-accent-fg"
+                : "border-line-strong bg-overlay text-muted hover:border-accent"
+            }`}
+          >
+            {i + 1}
+          </button>
+        ))}
+        <button type="button" onClick={jump} className={`${buttonClass} ml-auto`}>
+          Jump
+        </button>
+      </div>
+      <p className="mt-1.5 font-mono text-[10px] text-accent">{pose.id}</p>
+
+      <p className="mt-2 text-[10px] uppercase tracking-wide text-muted">Position</p>
+      {axis("position", 0, "X · left / right")}
+      {axis("position", 1, "Y · height")}
+      {axis("position", 2, "Z · distance")}
+
+      <p className="mt-2 text-[10px] uppercase tracking-wide text-muted">Aim</p>
+      {axis("target", 0, "X")}
+      {axis("target", 1, "Y")}
+      {axis("target", 2, "Z")}
+
+      {scalar("exposure", "Exposure", 2.5)}
+      {scalar("finish", "Coating", 1)}
+    </section>
+  );
+}
+
 function readValue(group: Group, key: string): number | string {
   return (stageConfig[group] as Record<string, number | string>)[key];
 }
@@ -118,13 +253,18 @@ export function StageTuner() {
   };
 
   const copy = async () => {
-    await navigator.clipboard.writeText(stageConfigAsSource());
+    // Both halves: the look lives in stage-config.ts, the choreography in
+    // cinema.ts, and a design session almost always touches each.
+    await navigator.clipboard.writeText(
+      `${stageConfigAsSource()}\n\n/* --- camera poses, for src/lib/content/cinema.ts --- */\n${posesAsSource()}`,
+    );
     setCopied(true);
     setTimeout(() => setCopied(false), 1600);
   };
 
   const reset = () => {
     resetStageConfig();
+    resetPoses();
     document.documentElement.style.removeProperty("--stage-backdrop-lift");
     forceRender((n) => n + 1);
   };
@@ -147,7 +287,7 @@ export function StageTuner() {
   return (
     <aside
       aria-label="Stage tuner (development only)"
-      className="fixed bottom-4 right-4 z-[200] max-h-[85vh] w-[290px] overflow-y-auto rounded-md border border-line-strong bg-surface/95 p-3 text-fg shadow-lg backdrop-blur"
+      className="fixed bottom-4 right-4 z-[200] max-h-[88vh] w-[300px] overflow-y-auto rounded-md border border-line-strong bg-surface/95 p-3 text-fg shadow-lg backdrop-blur"
     >
       <div className="mb-3 flex items-center justify-between gap-2">
         <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-accent">
@@ -157,6 +297,8 @@ export function StageTuner() {
           Hide
         </button>
       </div>
+
+      <CameraEditor onChange={() => forceRender((n) => n + 1)} buttonClass={button} />
 
       {SECTIONS.map((section) => (
         <section key={section.title} className="mb-4">

@@ -52,6 +52,24 @@ three procedural attempts at the car passed every numeric check and still
 looked wrong, because geometry harnesses measure whether a mesh is *valid*, not
 whether it looks good. Look at it.
 
+### Scroll & camera — the choreography
+
+The panel's first section edits the seven camera poses live. Pick an act, press
+**Jump** to scroll the page to it, then frame it with the position, aim,
+exposure and coating sliders. **Copy values** exports both the look block *and*
+the poses block, since a design session almost always touches each.
+
+Poses are content (`src/lib/content/cinema.ts`); the panel edits a mutable
+working copy that `pose.ts` samples from. Production reads the content module
+unchanged.
+
+### Trim — everything that is not paint
+
+Glass tint and opacity, rim colour and finish, tyre colour, lamp glow. These
+exist because the model ships without textures: strip them and glass, rims and
+lamps all arrive as flat placeholders. Glass opacity at 0 is invisible glass —
+the exact bug that made the windshield look missing.
+
 ### Material — applies next frame
 
 | Value | Range | Effect |

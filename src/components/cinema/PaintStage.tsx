@@ -205,6 +205,7 @@ export default function PaintStage({ active }: { active: boolean }) {
           paintRef={materialRef}
           form={config.form}
           material={config.material}
+          trim={config.trim}
           clearcoat={CLEARCOAT_RANGE}
           clearcoatRoughness={CLEARCOAT_ROUGHNESS_RANGE}
           envIntensityBare={ENV_INTENSITY_BARE}
