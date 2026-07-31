@@ -76,7 +76,7 @@ export const STAGE_DEFAULTS: StageConfig = {
     length: 6.65,
   },
   material: {
-    color: "#d36400",
+    color: "#9f2f00",
     metalness: 0.23,
     roughnessBare: 0.19,
     roughnessCoated: 0,
@@ -98,7 +98,7 @@ export const STAGE_DEFAULTS: StageConfig = {
     sweepRight: 4.4,
     bronzeRim: 8.2,
     fill: 0.85,
-    keyColor: "#fffaf2",
+    keyColor: "#f2d5ab",
     bronzeColor: NERO.accent,
   },
   camera: { fov: 30 },
