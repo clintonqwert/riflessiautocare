@@ -75,10 +75,31 @@ pass, the most expensive thing this scene could do.
 
 ## Replacing it
 
-1. Prepare the new asset the same way (strip textures and anything not visible
-   from outside; check the licence and any trademarks).
-2. Drop it at `public/models/car-concept.glb`, or change `CAR_MODEL_URL`.
-3. Confirm its body materials match `/^Paint/i`, or adjust the pattern.
-4. Update the footer credit and this file.
-5. Re-shoot the sequence (see `STAGE-TUNING.md`) — a different car will need the
-   camera poses in `cinema.ts` reframed.
+Preparation is a single command:
+
+```bash
+node scripts/prepare-car-model.mjs path/to/raw.glb
+```
+
+It drops hidden geometry, strips textures, compresses with meshopt, writes to
+`public/models/car-concept.glb`, and reports whether it found paint materials —
+if it did not, the stage cannot recolour the car and `PAINT_MATERIAL` in
+`CarModel.tsx` needs adjusting to the new asset's naming. Verified against the
+current asset: it reproduces the shipped 1.14 MB file exactly.
+
+Then:
+
+1. **Check the licence covers commercial use.** CC BY and CC0 do;
+   **NonCommercial and Editorial do not** and cannot be used on this site.
+2. **Check for trademarks.** A model licence covers the modeller's work, never
+   the manufacturer's marks or design rights. Stripping textures removes baked
+   badges and plates; anything modelled as geometry has to be deleted by hand.
+3. Update the footer credit and this file.
+4. Re-shoot the sequence (see `STAGE-TUNING.md`) — a different car will need the
+   camera poses in `cinema.ts` reframed, and the tuner's camera editor is the
+   fastest way to do it.
+
+### Sketchfab specifically
+
+Downloads need authentication even for CC BY models, so the file has to be
+fetched with an account and handed over — the API returns 401 without a token.
