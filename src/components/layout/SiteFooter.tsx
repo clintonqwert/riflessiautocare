@@ -109,6 +109,25 @@ export function SiteFooter() {
             ))}
           </ul>
         </div>
+
+        {/*
+          CC BY 4.0 on the homepage's 3D model requires attribution that reaches
+          visitors, not just a file in the repo — so it lives here rather than
+          only in docs/maintenance/STAGE-MODEL.md.
+        */}
+        <p className="mt-4 text-[11px] leading-relaxed text-muted/70">
+          Homepage 3D model &ldquo;Car Concept&rdquo; by Eric Chadwick for
+          Darmstadt Graphics Group, used under{" "}
+          <a
+            href="https://creativecommons.org/licenses/by/4.0/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 transition-colors hover:text-accent"
+          >
+            CC BY 4.0
+          </a>
+          . Modified: interior, textures, and logos removed.
+        </p>
       </div>
     </footer>
   );

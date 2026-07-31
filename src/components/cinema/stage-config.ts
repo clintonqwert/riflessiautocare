@@ -12,24 +12,13 @@ import { NERO } from "@/lib/design-tokens";
 export interface StageConfig {
   form: {
     /**
-     * Overall dimensions in scene units — literal, not multipliers. Every
-     * profile curve is normalised against these, so a real car's proportions
-     * can be dialled in directly. A coupe sits near 6.6 × 2.8 × 2.0.
+     * Overall length in scene units. The model is auto-fitted to this from its
+     * own bounds, so the asset's native scale never matters and swapping in a
+     * different car needs no measurement.
+     *
+     * Shape is fixed by the model — see docs/maintenance/STAGE-MODEL.md.
      */
     length: number;
-    width: number;
-    height: number;
-    /** Wheel and tyre scale. 1 fills the arches. */
-    wheelSize: number;
-    /**
-     * How far the greenhouse pulls in above the belt line. 0 = glass sits flush
-     * with the flanks, 1 = a strongly tapered cabin.
-     */
-    tumblehome: number;
-    /** Extra width over the rear axle. 0 removes the hips entirely. */
-    haunch: number;
-    /** How far the sills tuck under the widest point. 1 = slab sided. */
-    sillTuck: number;
   };
   material: {
     /** Base paint colour. Reflections do most of the work, so keep it dark. */
@@ -67,15 +56,7 @@ export interface StageConfig {
 
 export const STAGE_DEFAULTS: StageConfig = {
   form: {
-    // Real coupe proportions: width 0.42 of length, height 0.31, wheelbase
-    // 0.62. Getting these right is most of what makes it read as a car.
     length: 6.65,
-    width: 2.78,
-    height: 2.04,
-    wheelSize: 1,
-    tumblehome: 0.45,
-    haunch: 1,
-    sillTuck: 0.88,
   },
   material: {
     color: "#f0f2f4",

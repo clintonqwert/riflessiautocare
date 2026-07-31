@@ -104,13 +104,17 @@ length the array is.
    assistive tech and find-in-page behave best with.
 7. **The stage pauses off screen.** An IntersectionObserver flips `frameloop`
    to `never`; the page continues for several sections below the sequence.
-8. **No asset downloads.** Geometry is generated in `car-silhouette-geometry.ts`
-   and the environment is baked from `Lightformer` planes. No GLB, no HDR,
-   nothing licensed, nothing traced from a real manufacturer's bodywork.
-9. **Winding is load-bearing.** The solid renders front-faces only, so a
-   reversed triangle is an invisible hole and an inverted normal is a surface
-   lit from underneath. Both are silent in a screenshot. Keep the orientation
-   assertions in any geometry change.
+8. **One asset, licensed and documented.** The car is a CC BY 4.0 model
+   (`docs/maintenance/STAGE-MODEL.md`); the environment is still baked from
+   `Lightformer` planes, so no HDR is fetched. The attribution the licence
+   requires is rendered in the footer. Three procedural attempts preceded this
+   and all read as a blob — the honest lesson is that a convincing car is
+   modelling work, not parameter tuning.
+9. **Look at it.** Three procedural attempts at the car passed every numeric
+   check — normals, proportions, no tears — and all three looked wrong. A
+   geometry harness measures whether a mesh is *valid*, never whether it is
+   *good*. The scene can be screenshotted headlessly (`STAGE-TUNING.md`); do
+   that before claiming a visual change works.
 
 ### Tuning the look
 
@@ -126,9 +130,7 @@ wiring.
 
 Two things deliberately stay out of the panel:
 
-- **The silhouette curves** — `SILHOUETTE`, `ROCKER`, `BODY_WIDTH`,
-  `ROOF_WIDTH`, and `SHOULDER_HEIGHT` in `car-silhouette-geometry.ts`. Those five keyframe arrays
-  are the car; the panel exposes overall proportions instead.
+- **The car's shape** — fixed by the model. The panel exposes only its scale.
 - **The seven camera poses** — `src/lib/content/cinema.ts`. Those are content,
   not look: changing them changes the story. Re-run the camera-path check after
   editing so the camera never ends up inside the mesh.

@@ -45,30 +45,9 @@ type Control = RangeControl | ColorControl;
 const SECTIONS: { title: string; note: string; controls: Control[] }[] = [
   {
     title: "Body",
-    note: "Overall dimensions in scene units. A coupe sits near 6.6 × 2.8 × 2.0.",
+    note: "Shape comes from the model; only its scale is tunable here.",
     controls: [
-      { kind: "range", group: "form", key: "length", label: "Length", min: 3, max: 9, step: 0.05 },
-      { kind: "range", group: "form", key: "width", label: "Width", min: 1.2, max: 4.2, step: 0.02 },
-      {
-        kind: "range", group: "form", key: "height", label: "Height", min: 1, max: 3.2, step: 0.02,
-        hint: "Roughly 0.31 of length on a real coupe — lower reads faster",
-      },
-      {
-        kind: "range", group: "form", key: "wheelSize", label: "Wheel size", min: 0.6, max: 1.4, step: 0.01,
-        hint: "1 fills the arches; larger reads more aggressive",
-      },
-      {
-        kind: "range", group: "form", key: "tumblehome", label: "Tumblehome", min: 0, max: 1, step: 0.01,
-        hint: "How far the glasshouse pulls in above the belt line",
-      },
-      {
-        kind: "range", group: "form", key: "haunch", label: "Rear haunch", min: 0, max: 2.5, step: 0.05,
-        hint: "Width over the rear axle. 0 removes the hips",
-      },
-      {
-        kind: "range", group: "form", key: "sillTuck", label: "Sill tuck", min: 0.5, max: 1, step: 0.01,
-        hint: "1 = slab sided, lower pulls the sills under",
-      },
+      { kind: "range", group: "form", key: "length", label: "Length", min: 3, max: 12, step: 0.05 },
     ],
   },
   {

@@ -1,14 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
+import {
+  Suspense,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type RefObject,
+} from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, Lightformer } from "@react-three/drei";
 import { MathUtils, Vector3, type MeshPhysicalMaterial } from "three";
 import { getOpeningPose } from "@/lib/content/cinema";
-import {
-  createCarBodyGeometry,
-  createWheelsGeometry,
-} from "./car-silhouette-geometry";
+import { CarModel } from "./CarModel";
 import { createSampledPose, samplePose } from "./pose";
 import { stageProgress } from "./scroll-progress";
 import {
@@ -104,71 +108,6 @@ function StageDirector({ materialRef }: { materialRef: MaterialRef }) {
   return null;
 }
 
-function CarBody({
-  materialRef,
-  form,
-  material,
-}: {
-  materialRef: MaterialRef;
-  form: StageConfig["form"];
-  material: StageConfig["material"];
-}) {
-  // Rebuilt exactly when a form slider moves. Pure arithmetic, cheap enough to
-  // regenerate on drag.
-  const body = useMemo(() => createCarBodyGeometry(form), [form]);
-  const wheels = useMemo(() => createWheelsGeometry(form), [form]);
-  useEffect(() => () => body.dispose(), [body]);
-  useEffect(() => () => wheels.dispose(), [wheels]);
-
-  // Both meshes are built sitting on y=0, so the pair has to be lifted to sit
-  // around the origin the camera poses aim at. Derived from the body's own
-  // bounds rather than hard-coded: resize in the tuner and framing still holds.
-  const centreY = useMemo(() => {
-    body.computeBoundingBox();
-    const box = body.boundingBox;
-    return box ? -(box.max.y + box.min.y) / 2 : 0;
-  }, [body]);
-
-  return (
-    <group position={[0, centreY, 0]}>
-      <mesh geometry={body}>
-        {/*
-          Automotive paint is pigment under a clear coat, not bare metal — so
-          the base colour stays flat while the clearcoat layer does the
-          reflecting. That separation is what lets the coating beat in act six
-          read as a real change in finish.
-
-          The solid is closed and correctly wound, so it renders front faces
-          only.
-        */}
-        <meshPhysicalMaterial
-          ref={materialRef}
-          color={material.color}
-          metalness={material.metalness}
-          roughness={material.roughnessBare}
-          clearcoat={CLEARCOAT_RANGE[0]}
-          clearcoatRoughness={CLEARCOAT_ROUGHNESS_RANGE[0]}
-          envMapIntensity={ENV_INTENSITY_BARE}
-        />
-      </mesh>
-
-      {/*
-        Wheels are deliberately near-black and matte. The tonal break against
-        the body is doing as much work as the geometry — it is what makes the
-        arches read, and with them the whole silhouette.
-      */}
-      <mesh geometry={wheels}>
-        <meshStandardMaterial
-          color="#0d0d10"
-          metalness={0.1}
-          roughness={0.62}
-          envMapIntensity={0.35}
-        />
-      </mesh>
-    </group>
-  );
-}
-
 /**
  * A showroom light rig built entirely from emissive planes, baked once into an
  * environment map. No HDR file is fetched — nothing here touches the network.
@@ -261,11 +200,16 @@ export default function PaintStage({ active }: { active: boolean }) {
       }}
     >
       <ShowroomRig light={config.light} />
-      <CarBody
-        materialRef={materialRef}
-        form={config.form}
-        material={config.material}
-      />
+      <Suspense fallback={null}>
+        <CarModel
+          paintRef={materialRef}
+          form={config.form}
+          material={config.material}
+          clearcoat={CLEARCOAT_RANGE}
+          clearcoatRoughness={CLEARCOAT_ROUGHNESS_RANGE}
+          envIntensityBare={ENV_INTENSITY_BARE}
+        />
+      </Suspense>
       <StageDirector materialRef={materialRef} />
     </Canvas>
   );

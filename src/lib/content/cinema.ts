@@ -45,8 +45,8 @@ const acts: CinemaAct[] = [
     heading: "One vehicle. Undivided attention.",
     body: "Riflessi is a private, appointment-only detailing service. Drop off your car and it gets the bay to itself and one craftsman's full attention — until the finish is right.",
     pose: {
-      position: [0.4, 0.5, 11.5],
-      target: [0, 0, 0],
+      position: [1.0, 2.2, 20.0],
+      target: [0, 0.1, 0],
       exposure: 0.16,
       finish: 0.3,
     },
@@ -57,8 +57,8 @@ const acts: CinemaAct[] = [
     heading: "The finish is the whole argument.",
     body: "Riflessi is Italian for reflections. When the work is done, paint should hand back a clean picture of whatever stands in front of it — no haze softening the edges, no swirls breaking up the light.",
     pose: {
-      position: [4.7, 1.9, 5.3],
-      target: [0, 0.15, 0],
+      position: [9.5, 3.4, 11.0],
+      target: [0, 0.2, 0],
       exposure: 1,
       finish: 0.48,
     },
@@ -69,8 +69,8 @@ const acts: CinemaAct[] = [
     heading: "Every angle gets the same hour.",
     body: "Paint is judged from more than one position, because that is how you will see the car. What looks finished head-on can still show haze at a rake, so the walk around happens before the car is called done — not after you have driven it home.",
     pose: {
-      position: [-5.9, 1.15, 3.1],
-      target: [0, 0.2, 0],
+      position: [-11.5, 2.4, 6.5],
+      target: [0, 0.3, 0],
       exposure: 0.92,
       finish: 0.55,
     },
@@ -85,8 +85,8 @@ const acts: CinemaAct[] = [
     // sequence, so it is the first to clip if the body is widened. Re-run the
     // camera-path check after changing `form` in stage-config.ts.
     pose: {
-      position: [3.15, 0.7, 3.35],
-      target: [1.85, 0.04, 0.9],
+      position: [4.3, 1.15, 4.8],
+      target: [1.9, 0.05, 1.2],
       exposure: 1.18,
       finish: 0.62,
     },
@@ -97,8 +97,8 @@ const acts: CinemaAct[] = [
     heading: "Four services. Each done completely.",
     body: "No fifteen-item menu and no upsell ladder — four ways to bring a car back, each one taken start to finish inside a single booking.",
     pose: {
-      position: [2.3, 3.5, 7.4],
-      target: [0, -0.4, 0],
+      position: [4.5, 7.5, 14.5],
+      target: [0, -0.6, 0],
       exposure: 0.58,
       finish: 0.68,
     },
@@ -109,8 +109,8 @@ const acts: CinemaAct[] = [
     heading: "Then the gloss gets sealed in.",
     body: "Polishing restores the reflection; protection is what keeps it. A sealant carries a car through months of BC weather, and a properly prepped ceramic coating through years — cured under cover before the car goes back on the road.",
     pose: {
-      position: [-3.0, 1.0, 3.9],
-      target: [0, 0.08, 0],
+      position: [-6.5, 2.0, 8.5],
+      target: [0, 0.15, 0],
       exposure: 1.3,
       finish: 1,
     },
@@ -121,7 +121,7 @@ const acts: CinemaAct[] = [
     heading: "Bring it by. See it in daylight.",
     body: `One vehicle holds the bay for the whole visit. Send the booking form with your car and a preferred day, and you'll get a personal reply ${BOOKING_RESPONSE_PROMISE}.`,
     pose: {
-      position: [0.7, 2.4, 8.6],
+      position: [1.4, 4.2, 16.5],
       target: [0, 0, 0],
       exposure: 0.88,
       finish: 1,

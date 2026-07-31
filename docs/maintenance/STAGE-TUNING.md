@@ -29,41 +29,28 @@ build time. Verified by grepping the production chunks.
 
 ## What each dial does
 
-### Body — rebuilds the mesh
+### Body
 
-A loft: a closed cross-section swept along a silhouette profile from nose to
-tail, with wheel arches cut into the rocker line and wheels sitting in them.
-
-**The arches and wheels are what make it read as a car.** An earlier version
-omitted them on the theory that a wheel-less clay buck was more elegant; it
-read as a soap bar. If the silhouette ever stops working, check those first.
-
-Dimensions are literal scene units, not multipliers, so real proportions can be
-dialled in directly. A coupe sits near **6.6 × 2.8 × 2.0** — width ≈ 0.42 of
-length, height ≈ 0.31, wheelbase ≈ 0.62.
+The car is a licensed model, not generated geometry — see
+**`STAGE-MODEL.md`** for provenance, licence, and how to replace it. Its shape
+is therefore fixed; only its scale is tunable.
 
 | Value | Range | Effect |
 | --- | --- | --- |
-| `length` | 3 – 9 | Nose to tail. |
-| `width` | 1.2 – 4.2 | Overall width. Past ~0.5 of length it reads as a toy. |
-| `height` | 1 – 3.2 | Overall height. Lower reads faster; ~0.31 of length is production-car normal. |
-| `wheelSize` | 0.6 – 1.4 | 1 fills the arches. Larger reads more aggressive, smaller leaves a visible gap and looks under-tyred. |
-| `tumblehome` | 0 – 1 | How far the glasshouse pulls in above the belt line. 0 = glass flush with the flanks and the cabin looks bolted on. |
-| `haunch` | 0 – 2.5 | Extra width over the rear axle. 0 removes the hips and it reads as a hatchback. |
-| `sillTuck` | 0.5 – 1 | 1 = slab sided; lower pulls the sills under so the body appears to float. |
+| `length` | 3 – 12 | Overall length in scene units. The model auto-fits to this from its own bounds. |
 
-The shape itself is five keyframe arrays in `car-silhouette-geometry.ts`:
-`SILHOUETTE` (roofline), `ROCKER` (the arched bottom edge), `BODY_WIDTH`,
-`ROOF_WIDTH`, and `SHOULDER_HEIGHT`. Those are the car. `FRONT_AXLE` and
-`REAR_AXLE` set the wheelbase and the arch positions together.
+> **Changing `length` reframes the whole sequence.** The camera poses in
+> `cinema.ts` are composed for the shipped value; scale the car and every act
+> is framed differently. Re-shoot before committing — see below.
 
-> **After changing anything under Body, re-run the camera-path check.** Growing
-> the car can put a camera pose inside the mesh, and because the body renders
-> front faces only it simply vanishes at that point in the scroll rather than
-> looking obviously broken. The `craft` act rakes across the rear haunch and is
-> the tightest pose — it will always fail first. The mesh centres itself
-> vertically from its own bounds, so `height` alone is safe; `length` and
-> `width` are the risky ones.
+### Seeing your changes
+
+The scene can be screenshotted headlessly, which is how the camera poses were
+composed. Chrome for Testing plus `puppeteer-core` driving `npm run dev`,
+scrolling to a given progress, and capturing. This matters more than it sounds:
+three procedural attempts at the car passed every numeric check and still
+looked wrong, because geometry harnesses measure whether a mesh is *valid*, not
+whether it looks good. Look at it.
 
 ### Material — applies next frame
 
@@ -112,22 +99,6 @@ backdrop.lift                70
 material.roughnessBare  0.62    material.roughnessCoated  0.28
 material.metalness      0.35    material.envIntensityCoated  1.1
 light.key               7.5     light.fill                0.5
-```
-
-**Wide-body** — hips and shoulders pushed out, cabin pinched in, big wheels.
-
-```
-form.width       3.25   form.haunch     2.0
-form.tumblehome  0.85   form.sillTuck   0.78
-form.wheelSize   1.2    camera.fov      44
-```
-
-**Long and low** — stretched and flattened, closer to a GT than a compact coupe.
-
-```
-form.length  7.8    form.height     1.85
-form.width   2.9    form.tumblehome 0.5
-camera.fov   28
 ```
 
 **Maximum contrast** — hard key, near-zero fill, bright backdrop.
