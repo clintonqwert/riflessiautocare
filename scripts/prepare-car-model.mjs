@@ -2,10 +2,12 @@
 /**
  * Prepares a raw car GLB for the homepage stage.
  *
- *   node scripts/prepare-car-model.mjs <input.glb> [output.glb]
+ *   node scripts/prepare-car-model.mjs <input.glb> [basename]
  *
- * Defaults the output to public/models/car-concept.glb, which is what
- * `CarModel.tsx` loads.
+ * Writes public/models/<basename>-<contenthash>.glb, rewrites CAR_MODEL_URL in
+ * CarModel.tsx to match, and deletes any older model. The hash matters:
+ * /models/* is served immutable for a year, so reusing a filename means
+ * returning visitors keep the old car indefinitely.
  *
  * Marketplace car models are built for offline rendering: full interiors,
  * dozens of 2–4K textures, often 50 MB+. None of that survives contact with a
@@ -28,6 +30,7 @@
  * adjusting to match the new asset's naming.
  */
 
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { NodeIO } from "@gltf-transform/core";
@@ -43,7 +46,14 @@ import {
 import { MeshoptEncoder, MeshoptSimplifier } from "meshoptimizer";
 
 const input = process.argv[2];
-const output = process.argv[3] ?? "public/models/car-concept.glb";
+/**
+ * Basename only — the content hash and extension are appended. `/models/*` is
+ * served immutable for a year, so the filename MUST change when the bytes do.
+ * Overwriting a fixed name means returning visitors keep the old car forever;
+ * that bug shipped once already.
+ */
+const name = process.argv[3] ?? "car";
+const outputDir = "public/models";
 
 if (!input) {
   console.error("usage: node scripts/prepare-car-model.mjs <input.glb> [output.glb]");
@@ -153,8 +163,37 @@ doc
   .setRequired(true)
   .setEncoderOptions({ method: EXTMeshoptCompression.EncoderMethod.QUANTIZE });
 
-fs.mkdirSync(path.dirname(output), { recursive: true });
-await io.write(output, doc);
+fs.mkdirSync(outputDir, { recursive: true });
+const tmp = path.join(outputDir, `.${name}.tmp.glb`);
+await io.write(tmp, doc);
+
+const hash = crypto
+  .createHash("sha256")
+  .update(fs.readFileSync(tmp))
+  .digest("hex")
+  .slice(0, 8);
+const output = path.join(outputDir, `${name}-${hash}.glb`);
+fs.renameSync(tmp, output);
+
+// Point the app at the new file and drop every older model, so nothing stale
+// lingers in the bundle or the repo.
+const modelSource = "src/components/cinema/CarModel.tsx";
+const src = fs.readFileSync(modelSource, "utf8");
+const url = `/models/${name}-${hash}.glb`;
+const updated = src.replace(
+  /export const CAR_MODEL_URL = "[^"]*";/,
+  `export const CAR_MODEL_URL = "${url}";`,
+);
+if (updated !== src) {
+  fs.writeFileSync(modelSource, updated);
+  console.log(`\n  CAR_MODEL_URL → ${url}`);
+}
+for (const file of fs.readdirSync(outputDir)) {
+  if (file.endsWith(".glb") && file !== path.basename(output)) {
+    fs.unlinkSync(path.join(outputDir, file));
+    console.log(`  removed stale ${file}`);
+  }
+}
 
 const materials = root.listMaterials().map((m) => m.getName()).filter(Boolean);
 const paint = materials.filter((n) => PAINT.test(n));

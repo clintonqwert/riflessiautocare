@@ -27,7 +27,7 @@ import type { StageConfig } from "./stage-config";
  * measurement.
  */
 
-export const CAR_MODEL_URL = "/models/car-concept.glb";
+export const CAR_MODEL_URL = "/models/car-centenario-8f524d9c.glb";
 
 /**
  * Material-name patterns, matched in order. Marketplace models name things

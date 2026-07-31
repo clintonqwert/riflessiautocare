@@ -89,11 +89,21 @@ pass, the most expensive thing this scene could do.
 Preparation is a single command:
 
 ```bash
-node scripts/prepare-car-model.mjs path/to/raw.glb
+node scripts/prepare-car-model.mjs path/to/raw.glb centenario
 ```
 
-It drops hidden geometry, strips textures, compresses with meshopt, writes to
-`public/models/car-concept.glb`, and reports whether it found paint materials —
+The second argument is a basename; the script appends a content hash, writes
+`public/models/<basename>-<hash>.glb`, rewrites `CAR_MODEL_URL` in
+`CarModel.tsx`, and deletes the previous model.
+
+**The hash is not cosmetic.** `/models/*` is served `immutable` for a year, so
+reusing a filename means returning visitors keep the old car indefinitely — the
+new bytes are on the server and nobody ever fetches them. That shipped once:
+the Centenario replaced the concept car under the same filename and looked, to
+anyone with a warm cache, like the swap had silently failed.
+
+It drops hidden geometry, strips textures, compresses with meshopt, and
+reports whether it found paint materials —
 if it did not, the stage cannot recolour the car and `PAINT_MATERIAL` in
 `CarModel.tsx` needs adjusting to the new asset's naming. Verified against the
 current asset: it reproduces the shipped 1.14 MB file exactly.
