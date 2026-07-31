@@ -76,7 +76,10 @@ export const STAGE_DEFAULTS: StageConfig = {
     length: 6.65,
   },
   material: {
-    color: "#9f2f00",
+    // The asset's own finish: exposed carbon, sampled across five points of
+    // bodywork in SDC's render of the model. Sits on the Nero Lucido obsidian,
+    // and the model's own gold accent meshes land close to champagne bronze.
+    color: "#232323",
     metalness: 0.23,
     roughnessBare: 0.19,
     roughnessCoated: 0,
