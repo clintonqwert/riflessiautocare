@@ -52,6 +52,11 @@ interface CarModelProps {
   form: StageConfig["form"];
   material: StageConfig["material"];
   trim: StageConfig["trim"];
+  /**
+   * Reports where the fitted car's wheels sit, so the plinth can be placed
+   * against the model rather than against a guess. Fires once per fit.
+   */
+  onGroundY?: (y: number) => void;
   /** Clearcoat pair, kept in sync with the animated ranges in PaintStage. */
   clearcoat: readonly [number, number];
   clearcoatRoughness: readonly [number, number];
@@ -63,6 +68,7 @@ export function CarModel({
   form,
   material,
   trim,
+  onGroundY,
   clearcoat,
   clearcoatRoughness,
   envIntensityBare,
@@ -108,8 +114,15 @@ export function CarModel({
     return {
       scale,
       offset: new Vector3(-centre.x * scale, -centre.y * scale, -centre.z * scale),
+      // The car is centred on the origin, so its wheels sit half its height
+      // below it.
+      groundY: (-size.y / 2) * scale,
     };
   }, [scene, form.length]);
+
+  useEffect(() => {
+    onGroundY?.(fit.groundY);
+  }, [fit.groundY, onGroundY]);
 
   /**
    * Trim materials. The asset ships without textures, so glass, rims, tyres and
