@@ -52,6 +52,11 @@ interface CarModelProps {
   form: StageConfig["form"];
   material: StageConfig["material"];
   trim: StageConfig["trim"];
+  /**
+   * Reports where the fitted car's wheels sit, so the plinth can be placed
+   * against the model rather than against a guess. Fires once per fit.
+   */
+  onGroundY?: (y: number) => void;
   /** Clearcoat pair, kept in sync with the animated ranges in PaintStage. */
   clearcoat: readonly [number, number];
   clearcoatRoughness: readonly [number, number];
@@ -63,6 +68,7 @@ export function CarModel({
   form,
   material,
   trim,
+  onGroundY,
   clearcoat,
   clearcoatRoughness,
   envIntensityBare,
@@ -105,11 +111,41 @@ export function CarModel({
     const size = box.getSize(new Vector3());
     const centre = box.getCenter(new Vector3());
     const scale = size.x > 0 ? form.length / size.x : 1;
+
+    /**
+     * Where the car actually touches the ground — the underside of the tyres,
+     * not the bottom of the bounding box.
+     *
+     * A car's lowest geometry is rarely its contact patch: splitters,
+     * diffusers, exhausts and modelled underbody all hang below the tread. On
+     * this asset the box bottom sits 0.38 local units under the tyres — 1.11
+     * scene units once fitted — which left the car hovering that far above its
+     * own platform.
+     */
+    const tyreBox = new Box3();
+    let foundTyres = false;
+    scene.traverse((child: Object3D) => {
+      const mesh = child as Mesh;
+      if (!mesh.isMesh) return;
+      const material = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
+      if (!TYRE_MATERIAL.test(material?.name ?? "")) return;
+      tyreBox.expandByObject(mesh);
+      foundTyres = true;
+    });
+
+    // Local-space Y, then scaled and re-centred the same way the group is.
+    const contactY = foundTyres ? tyreBox.min.y : box.min.y;
+
     return {
       scale,
       offset: new Vector3(-centre.x * scale, -centre.y * scale, -centre.z * scale),
+      groundY: (contactY - centre.y) * scale,
     };
   }, [scene, form.length]);
+
+  useEffect(() => {
+    onGroundY?.(fit.groundY);
+  }, [fit.groundY, onGroundY]);
 
   /**
    * Trim materials. The asset ships without textures, so glass, rims, tyres and

@@ -2,6 +2,7 @@
 
 import {
   Suspense,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -13,6 +14,7 @@ import { Environment, Lightformer } from "@react-three/drei";
 import { MathUtils, Vector3, type MeshPhysicalMaterial } from "three";
 import { getOpeningPose } from "@/lib/content/cinema";
 import { CarModel } from "./CarModel";
+import { Plinth } from "./Plinth";
 import { createSampledPose, samplePose } from "./pose";
 import { stageProgress } from "./scroll-progress";
 import {
@@ -182,6 +184,11 @@ export default function PaintStage({ active }: { active: boolean }) {
   const opening = getOpeningPose();
   const config = useStageSnapshot();
 
+  // Measured from the loaded model rather than assumed, so the plinth stays
+  // under the wheels if the car is rescaled or replaced.
+  const [groundY, setGroundY] = useState<number | null>(null);
+  const handleGroundY = useCallback((y: number) => setGroundY(y), []);
+
   return (
     <Canvas
       // Paused outright when the sequence is off screen — the page continues
@@ -206,10 +213,21 @@ export default function PaintStage({ active }: { active: boolean }) {
           form={config.form}
           material={config.material}
           trim={config.trim}
+          onGroundY={handleGroundY}
           clearcoat={CLEARCOAT_RANGE}
           clearcoatRoughness={CLEARCOAT_ROUGHNESS_RANGE}
           envIntensityBare={ENV_INTENSITY_BARE}
         />
+        {/* Inside Suspense so it mounts with the car — the plinth needs the
+            model's measured ground plane, which does not exist until then. */}
+        {groundY !== null && (
+          <Plinth
+            stage={config.stage}
+            groundY={groundY}
+            carLength={config.form.length}
+            bronzeColor={config.light.bronzeColor}
+          />
+        )}
       </Suspense>
       <StageDirector materialRef={materialRef} />
     </Canvas>

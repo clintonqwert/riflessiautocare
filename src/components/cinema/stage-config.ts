@@ -48,6 +48,40 @@ export interface StageConfig {
     /** Emissive strength on head, brake, and signal lamps. */
     lightGlow: number;
   };
+  /**
+   * The plinth the car stands on, and the spotlight above it. Together they
+   * make the car read as an exhibit rather than a floating object.
+   */
+  stage: {
+    /** Plinth radius as a multiple of the car's length. */
+    plinthScale: number;
+    plinthColor: string;
+    plinthMetalness: number;
+    /** Low is a mirror; high is matte concrete. */
+    plinthRoughness: number;
+    /**
+     * Bronze inlay at the rim, in scene units. 0 (the default) omits it — a
+     * drawn outline makes the floor read as a raised dais. Non-zero is the
+     * hard-edged turntable look, if that is ever wanted deliberately.
+     */
+    ringWidth: number;
+    /** Softness of the shadow pooled under the car. */
+    shadowBlur: number;
+    shadowOpacity: number;
+    /**
+     * Brightness of the light pool on the platform. Emissive rather than lit —
+     * see Plinth.tsx for why a physical light cannot carry this.
+     */
+    poolIntensity: number;
+    /** Downlight above the car. */
+    spotIntensity: number;
+    spotHeight: number;
+    /** Cone half-angle in degrees. Narrow reads as a hard theatre spot. */
+    spotAngle: number;
+    /** Edge softness, 0–1. */
+    spotPenumbra: number;
+    spotColor: string;
+  };
   light: {
     /** Overhead softbox. */
     key: number;
@@ -95,12 +129,33 @@ export const STAGE_DEFAULTS: StageConfig = {
     tyreColor: "#0c0c0e",
     lightGlow: 1.1,
   },
+  stage: {
+    // The alpha ramp reaches zero at 0.7 of this radius, so the outer third is
+    // invisible and the rim never shows. Sized so the lit part comfortably
+    // exceeds the car's footprint.
+    plinthScale: 4.2,
+    plinthColor: "#17171b",
+    // Low metalness on purpose: metals have no diffuse response, so a
+    // spotlight pool cannot appear on a mirror-metal surface at all. Polished
+    // concrete both catches the pool and keeps a sheen from the environment.
+    plinthMetalness: 0.18,
+    plinthRoughness: 0.38,
+    ringWidth: 0,
+    shadowBlur: 3.4,
+    shadowOpacity: 0.11,
+    poolIntensity: 0.42,
+    spotIntensity: 1020,
+    spotHeight: 16,
+    spotAngle: 38,
+    spotPenumbra: 0.7,
+    spotColor: "#fff3e0",
+  },
   light: {
     key: 10.4,
     sweepLeft: 4.2,
     sweepRight: 4.4,
     bronzeRim: 8.2,
-    fill: 0.85,
+    fill: 0.9,
     keyColor: "#f2d5ab",
     bronzeColor: NERO.accent,
   },
@@ -117,6 +172,7 @@ function clone(config: StageConfig): StageConfig {
     form: { ...config.form },
     material: { ...config.material },
     trim: { ...config.trim },
+    stage: { ...config.stage },
     light: { ...config.light },
     camera: { ...config.camera },
     backdrop: { ...config.backdrop },
