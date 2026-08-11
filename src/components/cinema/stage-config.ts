@@ -59,7 +59,11 @@ export interface StageConfig {
     plinthMetalness: number;
     /** Low is a mirror; high is matte concrete. */
     plinthRoughness: number;
-    /** Width of the bronze inlay ring at the plinth's edge, in scene units. */
+    /**
+     * Bronze inlay at the rim, in scene units. 0 (the default) omits it — a
+     * drawn outline makes the floor read as a raised dais. Non-zero is the
+     * hard-edged turntable look, if that is ever wanted deliberately.
+     */
     ringWidth: number;
     /** Softness of the shadow pooled under the car. */
     shadowBlur: number;
@@ -126,17 +130,20 @@ export const STAGE_DEFAULTS: StageConfig = {
     lightGlow: 1.1,
   },
   stage: {
-    plinthScale: 1.5,
+    // The alpha ramp reaches zero at 0.7 of this radius, so the outer third is
+    // invisible and the rim never shows. Sized so the lit part comfortably
+    // exceeds the car's footprint.
+    plinthScale: 4.2,
     plinthColor: "#17171b",
     // Low metalness on purpose: metals have no diffuse response, so a
     // spotlight pool cannot appear on a mirror-metal surface at all. Polished
     // concrete both catches the pool and keeps a sheen from the environment.
     plinthMetalness: 0.18,
     plinthRoughness: 0.38,
-    ringWidth: 0.1,
-    shadowBlur: 2.6,
-    shadowOpacity: 0.82,
-    poolIntensity: 0.55,
+    ringWidth: 0,
+    shadowBlur: 3.4,
+    shadowOpacity: 0.7,
+    poolIntensity: 0.42,
     spotIntensity: 520,
     spotHeight: 7.5,
     spotAngle: 38,

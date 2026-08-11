@@ -42,6 +42,13 @@ function useStageTextures(): { falloff: CanvasTexture | null; pool: CanvasTextur
   return useMemo(() => {
     if (typeof document === "undefined") return { falloff: null, pool: null };
 
+    /**
+     * Greyscale only, and opaque. `alphaMap` and `emissiveMap` both read the
+     * texture's *colour* channel — three.js ignores a texture's alpha channel
+     * for alphaMap entirely. Writing the ramp as `rgba(255,255,255,x)` looks
+     * right and silently does nothing: the colour stays white, so the map
+     * evaluates to fully opaque everywhere and the disc keeps a hard rim.
+     */
     const ramp = (stops: [number, string][]): CanvasTexture | null => {
       const size = 512;
       const canvas = document.createElement("canvas");
@@ -49,6 +56,8 @@ function useStageTextures(): { falloff: CanvasTexture | null; pool: CanvasTextur
       canvas.height = size;
       const ctx = canvas.getContext("2d");
       if (!ctx) return null;
+      ctx.fillStyle = "#000000";
+      ctx.fillRect(0, 0, size, size);
       const g = ctx.createRadialGradient(
         size / 2, size / 2, 0,
         size / 2, size / 2, size / 2,
@@ -60,19 +69,33 @@ function useStageTextures(): { falloff: CanvasTexture | null; pool: CanvasTextur
     };
 
     return {
+      // Reaches zero at 0.7 and stays there, so the outer third of the disc is
+      // fully transparent and its rim can never be seen from any angle.
+      //
+      // Two earlier versions each put a hard line on screen: one held opacity
+      // to 0.55 before dropping, which drew a boundary on the floor and made
+      // the car look like it stood on a dais; the next faded all the way to
+      // the rim, so at grazing camera angles the disc's own silhouette cut a
+      // straight edge across the frame. The geometry has to end somewhere it
+      // is already invisible.
       falloff: ramp([
-        [0, "rgba(255,255,255,1)"],
-        [0.55, "rgba(255,255,255,0.92)"],
-        [0.82, "rgba(255,255,255,0.35)"],
-        [1, "rgba(255,255,255,0)"],
+        [0, "#f2f2f2"],
+        [0.16, "#b3b3b3"],
+        [0.32, "#666666"],
+        [0.46, "#303030"],
+        [0.58, "#0f0f0f"],
+        [0.7, "#000000"],
+        [1, "#000000"],
       ]),
-      // Tight and bright at the centre so it reads as a beam hitting the
-      // floor, not as an evenly glowing disc.
+      // Gone by 0.55, comfortably inside where the alpha has already faded, so
+      // the pool never lights a part of the disc that is about to end.
       pool: ramp([
         [0, "#ffffff"],
-        [0.18, "#d8d8d8"],
-        [0.4, "#5a5a5a"],
-        [0.66, "#1a1a1a"],
+        [0.12, "#c8c8c8"],
+        [0.26, "#7d7d7d"],
+        [0.4, "#3a3a3a"],
+        [0.55, "#101010"],
+        [0.7, "#000000"],
         [1, "#000000"],
       ]),
     };
@@ -132,21 +155,26 @@ export function Plinth({ stage, groundY, carLength, bronzeColor }: PlinthProps) 
         />
       </mesh>
 
-      {/* Bronze inlay at the rim — the brand accent, and the line that makes
-          the platform read as machined rather than as a shadow. */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, groundY + 0.001, 0]}>
-        <ringGeometry args={[radius - stage.ringWidth, radius, 96]} />
-        <meshStandardMaterial
-          color={bronzeColor}
-          metalness={0.9}
-          roughness={0.3}
-          emissive={bronzeColor}
-          emissiveIntensity={0.18}
-          transparent
-          opacity={0.55}
-          side={DoubleSide}
-        />
-      </mesh>
+      {/* Optional bronze inlay, off by default (ringWidth 0). A drawn rim
+          turns the floor into a plinth: the eye reads any closed outline as
+          the top face of a raised object, and the car appears to stand on a
+          dais rather than on the ground. Kept only because a hard-edged
+          turntable is a legitimate look if it is ever wanted deliberately. */}
+      {stage.ringWidth > 0 && (
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, groundY + 0.001, 0]}>
+          <ringGeometry args={[radius - stage.ringWidth, radius, 96]} />
+          <meshStandardMaterial
+            color={bronzeColor}
+            metalness={0.9}
+            roughness={0.3}
+            emissive={bronzeColor}
+            emissiveIntensity={0.18}
+            transparent
+            opacity={0.55}
+            side={DoubleSide}
+          />
+        </mesh>
+      )}
 
       {/* Baked on the first frame and never recomputed — the car is static, so
           re-rendering this every frame would be pure waste. */}
