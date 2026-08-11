@@ -4,25 +4,34 @@
  *
  *   npm run optimise-assets
  *
- * Reads whatever is in public/gallery and public/video, and for each image:
- * crops to the aspect the layout expects, resizes down if oversized, strips
- * all metadata, and recompresses.
+ * For every image: crops to the aspect the layout expects, resizes down if
+ * oversized, blurs any declared licence plates, strips all metadata, and
+ * recompresses.
  *
- * The metadata strip is the part that matters most. Phone and camera JPEGs
- * carry EXIF, and EXIF routinely includes GPS coordinates. These photos are
- * taken at a home address that the site deliberately does not publish — the
- * booking flow says the address is shared only after a booking is confirmed —
- * so shipping the originals would hand out the one fact the copy withholds.
- * sharp drops all metadata unless explicitly told to keep it; this is not
- * relying on that default silently, it is the reason the script exists.
+ * Two things here are about privacy rather than performance.
  *
- * Idempotent: already-optimised files are detected by size and skipped, so it
- * is safe to re-run after adding one new photo.
+ * The metadata strip: camera and phone JPEGs carry EXIF, and EXIF routinely
+ * includes GPS. These photos are taken at a home address the site deliberately
+ * withholds until a booking is confirmed, so shipping originals would publish
+ * the one fact the copy protects.
+ *
+ * The plate blur: a customer's registration is their information, not the
+ * business's, and it appears in photos they never agreed to have published.
+ * Regions come from `public/gallery/redactions.json` — see scripts/lib/redact.mjs
+ * for why they are declared rather than detected.
+ *
+ * Originals are moved to `public/gallery/_originals/` (gitignored) on first
+ * run and every optimised file is regenerated from them. That makes the script
+ * safely re-runnable: mark a plate you missed, run again, and the result is a
+ * single clean pass rather than a recompression of a recompression.
  */
 
 import fs from "node:fs";
 import path from "node:path";
 import sharp from "sharp";
+import { applyRedactions, loadManifest, unreviewed } from "./lib/redact.mjs";
+
+const ORIGINALS = "public/gallery/_originals";
 
 const TARGETS = [
   {
@@ -30,7 +39,14 @@ const TARGETS = [
     match: /-(before|after)\.jpe?g$/i,
     width: 1600,
     height: 1200,
-    label: "gallery pair (4:3)",
+    label: "before/after (4:3)",
+  },
+  {
+    dir: "public/gallery/showcase",
+    match: /\.jpe?g$/i,
+    width: 1600,
+    height: 1200,
+    label: "showcase (4:3)",
   },
   {
     dir: "public/video",
@@ -42,33 +58,32 @@ const TARGETS = [
 ];
 
 const MAX_BYTES = 420 * 1024;
+const manifest = loadManifest();
+
 let processed = 0;
-let skipped = 0;
 const problems = [];
+const seen = [];
+
+fs.mkdirSync(ORIGINALS, { recursive: true });
 
 for (const target of TARGETS) {
   if (!fs.existsSync(target.dir)) continue;
 
   for (const file of fs.readdirSync(target.dir)) {
     if (!target.match.test(file)) continue;
-    const full = path.join(target.dir, file);
-    const before = fs.statSync(full).size;
+    const live = path.join(target.dir, file);
+    if (!fs.statSync(live).isFile()) continue;
 
-    const meta = await sharp(full).metadata();
-    // Already at (or capped below) the target aspect and weight, with nothing
-    // sensitive left in it.
-    const aspect = (meta.width ?? 0) / (meta.height ?? 1);
-    const wantAspect = target.width / target.height;
-    const alreadyRight =
-      Math.abs(aspect - wantAspect) < 0.01 &&
-      (meta.width ?? 0) <= target.width &&
-      before <= MAX_BYTES &&
-      !meta.exif;
+    seen.push(file);
 
-    if (alreadyRight) {
-      skipped++;
-      continue;
-    }
+    // Keep a pristine copy the first time we see a file, and always work from
+    // it thereafter, so repeated runs never stack lossy passes.
+    const original = path.join(ORIGINALS, file);
+    if (!fs.existsSync(original)) fs.copyFileSync(live, original);
+
+    const source = fs.readFileSync(original);
+    const meta = await sharp(source).metadata();
+    const boxes = manifest[file]?.plates ?? [];
 
     if ((meta.width ?? 0) < target.width * 0.75) {
       problems.push(
@@ -76,39 +91,46 @@ for (const target of TARGETS) {
       );
     }
 
-    const tmp = `${full}.tmp`;
-    await sharp(full)
-      // withMetadata() is deliberately NOT called: that is what would carry
-      // EXIF, and with it GPS, through to the public file.
-      // withoutEnlargement: never invent pixels. A 1000px source stays 1000px
-      // wide — upscaling adds bytes and no detail, and the width warning above
-      // already tells the owner to re-export.
+    // withMetadata() is deliberately never called — that is what would carry
+    // EXIF, and with it GPS, into the published file.
+    let buffer = await sharp(source)
       .resize(target.width, target.height, {
         fit: "cover",
         position: "centre",
+        // Never invent pixels: a small source stays small and gets flagged
+        // above rather than inflated into a larger, softer file.
         withoutEnlargement: true,
       })
-      .jpeg({ quality: 82, mozjpeg: true })
-      .toFile(tmp);
+      .toBuffer();
 
-    fs.renameSync(tmp, full);
-    const after = fs.statSync(full).size;
+    buffer = await applyRedactions(buffer, boxes);
+
+    const out = await sharp(buffer).jpeg({ quality: 82, mozjpeg: true }).toBuffer();
+    fs.writeFileSync(live, out);
+
     const kb = (n) => `${(n / 1024).toFixed(0)} KB`;
+    const notes = [
+      meta.exif ? "EXIF stripped" : null,
+      boxes.length ? `${boxes.length} plate${boxes.length > 1 ? "s" : ""} blurred` : null,
+    ].filter(Boolean);
     console.log(
-      `  ${file.padEnd(42)} ${target.label.padEnd(20)} ${kb(before)} → ${kb(after)}${meta.exif ? "  (EXIF stripped)" : ""}`,
+      `  ${file.padEnd(40)} ${target.label.padEnd(20)} ${kb(source.length)} → ${kb(out.length)}` +
+        (notes.length ? `  (${notes.join(", ")})` : ""),
     );
+    if (out.length > MAX_BYTES) {
+      problems.push(`${file} is ${kb(out.length)} after compression — heavier than ideal.`);
+    }
     processed++;
   }
 }
 
-// Video is passed through untouched — re-encoding needs ffmpeg and would be a
-// lossy round trip. Just report if it is heavy enough to be worth compressing.
-const videoDir = "public/video";
-if (fs.existsSync(videoDir)) {
-  for (const file of fs.readdirSync(videoDir)) {
+// Video passes through untouched: re-encoding needs ffmpeg and would be a lossy
+// round trip. Report weight only.
+if (fs.existsSync("public/video")) {
+  for (const file of fs.readdirSync("public/video")) {
     if (!/\.mp4$/i.test(file)) continue;
-    const mb = fs.statSync(path.join(videoDir, file)).size / 1048576;
-    console.log(`  ${file.padEnd(42)} ${mb.toFixed(1)} MB`);
+    const mb = fs.statSync(path.join("public/video", file)).size / 1048576;
+    console.log(`  ${file.padEnd(40)} ${mb.toFixed(1)} MB`);
     if (mb > 30) {
       problems.push(
         `${file} is ${mb.toFixed(0)} MB. It only downloads on play, but that is a long wait — consider re-exporting at 1080p / ~8 Mbps.`,
@@ -117,12 +139,29 @@ if (fs.existsSync(videoDir)) {
   }
 }
 
-console.log(`\n  ${processed} processed, ${skipped} already optimised`);
+console.log(`\n  ${processed} image${processed === 1 ? "" : "s"} processed`);
+
+// The important report. Anything not in the manifest has had no human decision
+// recorded about whether a plate is visible in it.
+const pending = unreviewed(seen, manifest);
+if (pending.length) {
+  console.log(`\n  ⚠ ${pending.length} image(s) not yet checked for licence plates:`);
+  for (const f of pending) console.log(`      ${f}`);
+  console.log(
+    `\n    Open scripts/redact-tool.html in a browser, drag a box over any plate,\n` +
+      `    and paste the result into public/gallery/redactions.json. If a photo has\n` +
+      `    no plate in it, record that explicitly:\n\n` +
+      `      "${pending[0]}": { "plates": [], "note": "no plate visible" }\n\n` +
+      `    Then run this again. Until a file appears in that manifest, nobody has\n` +
+      `    actually looked.`,
+  );
+}
+
 if (problems.length) {
   console.log("\n  Worth a look:");
   for (const p of problems) console.log(`    - ${p}`);
 }
-if (!processed && !skipped) {
+if (!processed) {
   console.log("\n  Nothing found. See public/gallery/README.md for filenames.");
 }
 console.log("");

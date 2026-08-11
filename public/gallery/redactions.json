@@ -1,0 +1,5 @@
+{
+  "_comment": "One entry per photo. Plates are [x, y, width, height], each 0-1 relative to the image. Draw them with scripts/redact-tool.html. A photo with no plate still needs an entry — that is how the optimiser knows someone looked.",
+  "daily-driver-interior-before.jpg": { "plates": [], "note": "interior shot, no plate visible" },
+  "daily-driver-interior-after.jpg": { "plates": [], "note": "interior shot, no plate visible" }
+}

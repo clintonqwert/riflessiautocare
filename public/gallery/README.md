@@ -73,18 +73,71 @@ inaccessible to deaf visitors and its content is invisible to search.
 
 ---
 
-## 3. Then run
+## 3. Cars you've finished → `public/gallery/showcase/`
+
+Not before/after — just cars as they left. **Any number of files, any names.**
+Drop them in and they appear as a scrolling strip on the homepage and gallery.
+
+```
+public/gallery/showcase/
+  2019-porsche-911.jpg
+  black-m3-ceramic.jpg
+  ...
+```
+
+4:3 landscape, 1600 × 1200 or larger, same as above.
+
+Captions are optional. To add them, create `public/gallery/showcase/captions.json`:
+
+```json
+{
+  "2019-porsche-911.jpg": "Full correction and ceramic coating, cured overnight.",
+  "black-m3-ceramic.jpg": "Two-stage polish before coating."
+}
+```
+
+Without a caption, the filename becomes the alt text — so name files
+descriptively (`black-m3-ceramic.jpg`, not `IMG_4821.jpg`).
+
+---
+
+## 4. Licence plates
+
+**Every photo needs a decision recorded before it ships.** A customer's
+registration is their information, not yours, and it appears in photos they
+never agreed to have published.
+
+1. Open `scripts/redact-tool.html` in your browser (just double-click it).
+2. Open your photos, drag a box over any visible plate.
+3. Press **Copy JSON** and paste into `public/gallery/redactions.json`.
+4. Photos with no plate still need an entry — click **No plate in this one**.
+
+The optimiser lists every photo it has no entry for and will keep listing them.
+That list is the point: until a file appears in the manifest, nobody has
+actually looked at it.
+
+Boxes are blurred beyond recovery — the region is collapsed to five blocks
+across before blurring, so no character shapes survive. A light blur is
+readable; this is not.
+
+---
+
+## 5. Then run
 
 ```bash
 npm run optimise-assets
 ```
 
-Resizes, crops to the right aspect, strips camera EXIF (which includes GPS —
-your home address, if the photos were taken there) and compresses. It reports
-what it did and leaves your originals untouched.
+Resizes, crops, blurs the plates you marked, strips camera EXIF (which includes
+GPS — your home address, if the photos were taken there) and compresses.
 
-Keep your originals somewhere outside the repo. The versions here are
-web-sized and not worth archiving.
+Your untouched originals are moved to `public/gallery/_originals/` on first run
+and every web version is regenerated from them, so the script is safe to run
+again and again. Mark a plate you missed, re-run, and you get one clean pass
+rather than a compression of a compression.
+
+That folder is gitignored and never published — but keep your own backups
+elsewhere as well.
 
 ---
 

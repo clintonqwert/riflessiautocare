@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { buildMetadata, breadcrumbSchema, SITE_NAME } from "@/lib/seo";
 import { getGalleryItems } from "@/lib/content/gallery";
+import { getShowcase } from "@/lib/content/showcase";
 import { SERVICE_LABELS } from "@/types/content";
 import { PageHero } from "@/components/shared/PageHero";
 import { JsonLd } from "@/components/shared/JsonLd";
 import { CTABand } from "@/components/shared/CTABand";
 import { BeforeAfterSlider } from "@/components/shared/BeforeAfterSlider";
+import { ShowcaseCarousel } from "@/components/shared/ShowcaseCarousel";
 
 export const metadata: Metadata = buildMetadata({
   title: `Detailing Gallery — Before & After | ${SITE_NAME}`,
@@ -17,6 +19,7 @@ export const metadata: Metadata = buildMetadata({
 
 export default function GalleryPage() {
   const items = getGalleryItems();
+  const showcase = getShowcase();
 
   return (
     <>
@@ -57,6 +60,15 @@ export default function GalleryPage() {
           </div>
         </div>
       </section>
+
+      {showcase.length > 0 && (
+        <ShowcaseCarousel
+          items={showcase}
+          eyebrow="Il Portfolio"
+          heading="Cars that have been through the bay."
+          lede="Not before-and-afters — just how they left."
+        />
+      )}
 
       <CTABand
         headline="Want your car in the next set of frames?"
