@@ -32,13 +32,22 @@ too:
 
 ## Replacing them
 
+**Owner photography now has a documented drop point:
+`public/gallery/README.md`.** That file is written for the owner rather than for
+this repo's maintainers — exact filenames, the same-camera-position rule the
+comparison slider depends on, and `npm run optimise-assets` to crop, compress
+and strip EXIF. When those files land, delete the stock rows below, remove the
+footer's stock credit, and this section with them.
+
+### The mechanics
+
 The paths are stable and semantic. **Replace the files in place and no code
 changes are needed.** Aspect ratio is 4:3 throughout.
 
 | Path | Displayed at | Recommended source size |
 | --- | --- | --- |
 | `/images/*.jpg` | ~570 px wide | 1600 × 1200 |
-| `/images/gallery/*.jpg` | ~285 px wide | 1000 × 750 |
+| `/gallery/*.jpg` | ~285 px wide | 1000 × 750 |
 
 When a file is replaced with genuine photography:
 
@@ -63,9 +72,9 @@ every image here at the time it was added.
 | `/images/why-bay.jpg` | noe fornells | [view](https://unsplash.com/photos/two-cars-parked-in-front-of-a-garage-3ER5mAisgRo) |
 | `/images/why-single-vehicle.jpg` | Tuomas Nylund | [view](https://unsplash.com/photos/silver-coupe-inside-building-VNAQPOkc5Yg) |
 | `/images/why-craftsman.jpg` | Erik Mclean | [view](https://unsplash.com/photos/white-porsche-911-parked-near-white-house-u7B2HTbzVko) |
-| `/images/gallery/daily-driver-interior-before.jpg` | Sami Boudjelti | [view](https://unsplash.com/photos/the-interior-of-a-car-OqQcBlq9Kf4) |
-| `/images/gallery/daily-driver-interior-after.jpg` | Haryo Ramadantyo | [view](https://unsplash.com/photos/black-leather-car-seat-in-car-bjx6NQFNJLA) |
-| `/images/gallery/suv-exterior-gloss-before.jpg` | Colton Sturgeon | [view](https://unsplash.com/photos/rear-view-photo-of-black-alfa-romeo-459-1ScqCRoNvfA) |
-| `/images/gallery/suv-exterior-gloss-after.jpg` | Zulfahmi Khani | [view](https://unsplash.com/photos/a-black-and-white-photo-of-a-car-DRgp9FYsjIQ) |
-| `/images/gallery/coupe-ceramic-before.jpg` | JavyGo | [view](https://unsplash.com/photos/two-cars-parked-in-a-parking-space-next-to-each-other-w21aHNxINjs) |
-| `/images/gallery/coupe-ceramic-after.jpg` | GoGoNano | [view](https://unsplash.com/photos/gray-microfiber-cloth-on-a-black-car-hood-Df9XCGX9Y2U) |
+| `/gallery/daily-driver-interior-before.jpg` | Sami Boudjelti | [view](https://unsplash.com/photos/the-interior-of-a-car-OqQcBlq9Kf4) |
+| `/gallery/daily-driver-interior-after.jpg` | Haryo Ramadantyo | [view](https://unsplash.com/photos/black-leather-car-seat-in-car-bjx6NQFNJLA) |
+| `/gallery/suv-exterior-gloss-before.jpg` | Colton Sturgeon | [view](https://unsplash.com/photos/rear-view-photo-of-black-alfa-romeo-459-1ScqCRoNvfA) |
+| `/gallery/suv-exterior-gloss-after.jpg` | Zulfahmi Khani | [view](https://unsplash.com/photos/a-black-and-white-photo-of-a-car-DRgp9FYsjIQ) |
+| `/gallery/coupe-ceramic-before.jpg` | JavyGo | [view](https://unsplash.com/photos/two-cars-parked-in-a-parking-space-next-to-each-other-w21aHNxINjs) |
+| `/gallery/coupe-ceramic-after.jpg` | GoGoNano | [view](https://unsplash.com/photos/gray-microfiber-cloth-on-a-black-car-hood-Df9XCGX9Y2U) |

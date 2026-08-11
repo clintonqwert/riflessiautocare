@@ -7,6 +7,7 @@ import { getProcessSteps } from "@/lib/content/process";
 import { getGalleryItems } from "@/lib/content/gallery";
 import { getHomeFaq } from "@/lib/content/faq/home";
 import { getStats } from "@/lib/content/stats";
+import { getDemoFilm } from "@/lib/content/film";
 import { getCinemaActs } from "@/lib/content/cinema";
 import { PRIMARY_CTA } from "@/lib/content/navigation";
 import { CinematicSequence } from "@/components/cinema/CinematicSequence";
@@ -14,6 +15,7 @@ import { ServiceCards } from "@/components/home/ServiceCards";
 import { WhySection } from "@/components/home/WhySection";
 import { ProcessSection } from "@/components/home/ProcessSection";
 import { GalleryPreview } from "@/components/home/GalleryPreview";
+import { VideoFeature } from "@/components/shared/VideoFeature";
 import { FeaturedPackages } from "@/components/home/FeaturedPackages";
 import { ExperienceSection } from "@/components/home/ExperienceSection";
 import { FAQSection } from "@/components/shared/FAQSection";
@@ -34,6 +36,7 @@ export default function HomePage() {
   const faq = getHomeFaq();
   const stats = getStats();
   const acts = getCinemaActs();
+  const film = getDemoFilm();
 
   return (
     <>
@@ -93,6 +96,8 @@ export default function HomePage() {
       <WhySection stats={stats} />
       <ProcessSection steps={steps} />
       <GalleryPreview items={gallery} />
+      {/* Appears on its own once public/video/ holds the film and its poster. */}
+      {film && <VideoFeature {...film} />}
       <FeaturedPackages packages={packages} />
       <ExperienceSection />
       <FAQSection items={faq} />
