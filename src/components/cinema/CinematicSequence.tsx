@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useRef, useState, type ReactNode } from "react";
 import type { CinemaAct } from "@/lib/content/cinema";
+import { cn } from "@/lib/utils";
 import { useStageCapability } from "./capability";
 import { useScrollStory } from "./useScrollStory";
 import { StageFallback } from "./StageFallback";
@@ -48,7 +49,16 @@ function ActPanel({
     <section
       id={act.id}
       aria-labelledby={headingId}
-      className="relative flex min-h-svh flex-col justify-center py-28 md:py-32"
+      className={cn(
+        "relative flex flex-col justify-center",
+        // A full viewport per act is what gives the stage room to move behind
+        // the copy. Below md there is no stage — `capability` can never be
+        // "cinematic" under CINEMATIC_MIN_WIDTH — so reserving a screen per act
+        // buys nothing and costs a screen of empty scrolling between each one.
+        // The opening act keeps its height on every size: it is the hero, and
+        // it should still fill the first screen.
+        index === 0 ? "min-h-svh py-28 md:py-32" : "py-20 md:min-h-svh md:py-32",
+      )}
     >
       <div className="mx-auto w-full max-w-container px-5 md:px-8">
         <div className="max-w-xl" data-reveal>
