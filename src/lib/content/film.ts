@@ -27,6 +27,12 @@ export interface DemoFilm {
   lede: string;
   /** What the film shows, for anyone not watching it — and for search. */
   description: string;
+  /**
+   * Provenance line shown under the frame. Present while the film is
+   * illustrative rather than footage of this bay's own work; drop it once
+   * the film is replaced with real footage.
+   */
+  note?: string;
 }
 
 function publicFileExists(urlPath: string): boolean {
@@ -44,8 +50,14 @@ export function getDemoFilm(): DemoFilm | null {
     ...(publicFileExists(CAPTIONS) && { captionsSrc: CAPTIONS }),
     eyebrow: "Il Film",
     heading: "A detail, start to finish.",
-    lede: "What actually happens between drop-off and pickup — condensed, but nothing skipped.",
+    lede: "What the work looks like up close — decontamination, machine polish, the final wipe-down.",
+    // Deliberately describes what is on screen and nothing more. This footage
+    // is illustrative, not a recording of a customer's car, so it must not be
+    // written up as a walkthrough of a particular job in this bay — the
+    // photographs are the proof of work, and the note below keeps the line
+    // between the two visible.
     description:
-      "A walkthrough of a full detail in the Riflessi bay: the arrival assessment, two-bucket hand wash, decontamination and machine polish, interior extraction, and the final walkthrough in daylight before the car goes home.",
+      "Close-quarters footage of the craft: paint decontaminated, machine-polished, and wiped down under low light.",
+    note: "Illustrative footage — not a recording of a customer's car. Every photograph on this page was taken in the bay.",
   };
 }
