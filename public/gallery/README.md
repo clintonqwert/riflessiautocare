@@ -16,8 +16,8 @@ daily-driver-interior-before.jpg
 daily-driver-interior-after.jpg
 suv-exterior-gloss-before.jpg
 suv-exterior-gloss-after.jpg
-coupe-ceramic-before.jpg
-coupe-ceramic-after.jpg
+suv-ceramic-before.jpg
+suv-ceramic-after.jpg
 ```
 
 ### The one rule that matters

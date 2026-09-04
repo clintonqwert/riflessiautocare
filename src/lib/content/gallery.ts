@@ -36,14 +36,14 @@ const items: GalleryItem[] = [
     afterAlt: "SUV paint reflecting cleanly after machine polish",
   },
   {
-    slug: "coupe-ceramic",
-    vehicle: "Weekend coupe",
+    slug: "suv-ceramic",
+    vehicle: "Compact SUV",
     service: "ceramic-coating",
     summary: "Full prep and ceramic coating, cured under cover.",
-    beforeSrc: "/gallery/coupe-ceramic-before.jpg",
-    afterSrc: "/gallery/coupe-ceramic-after.jpg",
-    beforeAlt: "Coupe paint before decontamination and coating",
-    afterAlt: "Coupe with a deep gloss after ceramic coating",
+    beforeSrc: "/gallery/suv-ceramic-before.jpg",
+    afterSrc: "/gallery/suv-ceramic-after.jpg",
+    beforeAlt: "White compact SUV before decontamination and coating",
+    afterAlt: "White compact SUV with a deep gloss after ceramic coating",
   },
 ];
 
