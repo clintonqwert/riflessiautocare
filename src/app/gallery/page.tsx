@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { buildMetadata, breadcrumbSchema, SITE_NAME } from "@/lib/seo";
 import { getGalleryItems } from "@/lib/content/gallery";
+import { getShowcase } from "@/lib/content/showcase";
 import { SERVICE_LABELS } from "@/types/content";
 import { PageHero } from "@/components/shared/PageHero";
 import { JsonLd } from "@/components/shared/JsonLd";
 import { CTABand } from "@/components/shared/CTABand";
-import { BeforeAfterPair } from "@/components/shared/BeforeAfterPair";
+import { BeforeAfterSlider } from "@/components/shared/BeforeAfterSlider";
+import { ShowcaseCarousel } from "@/components/shared/ShowcaseCarousel";
 
 export const metadata: Metadata = buildMetadata({
   title: `Detailing Gallery — Before & After | ${SITE_NAME}`,
@@ -17,6 +19,7 @@ export const metadata: Metadata = buildMetadata({
 
 export default function GalleryPage() {
   const items = getGalleryItems();
+  const showcase = getShowcase();
 
   return (
     <>
@@ -29,7 +32,7 @@ export default function GalleryPage() {
       <PageHero
         eyebrow="Il Lavoro"
         heading="Judged in the same daylight it was finished in."
-        subheading="Before and after, shot side by side and left unedited. Paint either reflects properly or it doesn't — a photo cannot argue that either way."
+        subheading="Drag any photo to wipe between before and after. Both frames are shot from one position and left unedited — paint either reflects properly or it doesn't, and moving the handle is the whole argument."
       />
 
       <section className="bg-surface pb-24 md:pb-32" aria-label="Before and after work">
@@ -41,7 +44,11 @@ export default function GalleryPage() {
                 data-reveal
                 style={{ "--reveal-i": i % 2 } as React.CSSProperties}
               >
-                <BeforeAfterPair item={item} />
+                <BeforeAfterSlider
+                  item={item}
+                  sizes="(min-width: 768px) 50vw, 100vw"
+                  priority={i === 0}
+                />
                 <Link
                   href={`/services/${item.service}`}
                   className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-accent transition-colors hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
@@ -53,6 +60,15 @@ export default function GalleryPage() {
           </div>
         </div>
       </section>
+
+      {showcase.length > 0 && (
+        <ShowcaseCarousel
+          items={showcase}
+          eyebrow="Il Portfolio"
+          heading="Cars that have been through the bay."
+          lede="Not before-and-afters — just how they left."
+        />
+      )}
 
       <CTABand
         headline="Want your car in the next set of frames?"

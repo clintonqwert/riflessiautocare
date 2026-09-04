@@ -12,3 +12,7 @@ node_modules/
 HANDOFF.md
 !.env.example
 .vercel
+
+# Untouched source photos — the optimiser regenerates the web versions from
+# these, so they must not ship. Keep your own backups elsewhere too.
+public/gallery/_originals/

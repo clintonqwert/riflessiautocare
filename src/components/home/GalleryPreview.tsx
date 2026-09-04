@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { BeforeAfterPair } from "@/components/shared/BeforeAfterPair";
+import { BeforeAfterSlider } from "@/components/shared/BeforeAfterSlider";
 import type { GalleryItem } from "@/types/content";
 
 export function GalleryPreview({ items }: { items: GalleryItem[] }) {
@@ -11,13 +11,13 @@ export function GalleryPreview({ items }: { items: GalleryItem[] }) {
           id="gallery-heading"
           eyebrow="Il Lavoro"
           heading="Every detail is documented."
-          lede="Before-and-after photos land here as vehicles roll out — judged in the same daylight they were finished in."
+          lede="Drag to wipe between before and after. Every pair is judged in the same daylight it was finished in."
         />
         <div className="mt-12 grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-6">
           {items.slice(0, 3).map((item, i) => (
             <div key={item.slug} data-reveal style={{ "--reveal-i": i } as React.CSSProperties}>
-              {/* Three pairs across on desktop, so each frame is ~1/6 of the row. */}
-              <BeforeAfterPair item={item} sizes="(min-width: 768px) 17vw, 50vw" />
+              {/* Three across on desktop. */}
+              <BeforeAfterSlider item={item} sizes="(min-width: 768px) 33vw, 100vw" />
             </div>
           ))}
         </div>

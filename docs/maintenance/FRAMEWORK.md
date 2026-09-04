@@ -33,6 +33,12 @@ framework and should survive re-branding untouched.
    click-to-load facade.
 7. Business claims in copy must trace to `src/lib/content/site.ts` or a
    content module (the no-invention rule).
+
+   **Owner-supplied photography is stripped of metadata before it ships.**
+   `npm run optimise-assets` handles it; the reason is that camera EXIF carries
+   GPS, and these photos are taken at a home address the site deliberately
+   withholds until a booking is confirmed. Shipping originals would publish the
+   one fact the copy protects.
 8. **Imagery carries the same burden as copy.** A stock photo is safe where it
    depicts nothing specific about the business. Where a frame stands for the
    bay, the owner, or a customer's vehicle, only genuine photography can make
@@ -52,7 +58,19 @@ framework and should survive re-branding untouched.
 - `ui/SectionHeading.tsx` — eyebrow + display heading + signature hairline.
 - `shared/MediaFrame.tsx` — the single image treatment; gradient placeholder
   until real photography exists, so photo drops are additive.
-- `shared/BeforeAfterPair.tsx` — paired labeled frames, no JS slider.
+- `shared/BeforeAfterSlider.tsx` — before/after with a draggable divider.
+  Replaced `BeforeAfterPair`, which showed two frames side by side with no JS
+  (owner request, 2026-08-11). The trade is deliberate: it is now a client
+  component, but both images are in the DOM with real alt text regardless of
+  interaction, so nothing is gated behind a drag. It is a real `role="slider"`
+  — focusable, arrow keys, Home/End, and a percentage announced to screen
+  readers — because a div with pointer handlers would have been reachable by
+  mouse only. **Pairs must be shot from one camera position**, or the car
+  appears to jump as the handle moves.
+- `shared/VideoFeature.tsx` — click-to-load film facade. Only the poster loads
+  until play is pressed, which is the same rule the framework applies to
+  third-party embeds; a detailing film is tens of megabytes on a page that
+  already carries a 2 MB car model.
 - `shared/StatsBand.tsx` + `shared/CountUp.tsx` — animated counters with
   server-rendered final values (reduced-motion/no-JS safe).
 - `layout/StickyBookBar.tsx` — mobile-only persistent primary CTA

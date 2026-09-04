@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Riflessi — mark licence plates</title>
+<style>
+  :root { color-scheme: dark; }
+  body {
+    margin: 0; padding: 24px;
+    background: #0a0a0b; color: #f5f2ec;
+    font: 15px/1.55 ui-sans-serif, system-ui, sans-serif;
+  }
+  h1 { font-size: 23px; margin: 0 0 6px; }
+  p  { color: #9a958c; margin: 0 0 18px; max-width: 62ch; }
+  .row { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; }
+  .stage { position: relative; display: inline-block; line-height: 0; }
+  img { max-width: min(70vw, 900px); height: auto; cursor: crosshair; }
+  .box {
+    position: absolute; border: 2px solid #c8a96a;
+    background: rgba(200,169,106,.28); cursor: pointer;
+  }
+  .box:hover { background: rgba(255,80,80,.4); border-color: #ff5050; }
+  aside { flex: 1; min-width: 300px; }
+  textarea {
+    width: 100%; height: 260px; background: #121214; color: #f5f2ec;
+    border: 1px solid #34343a; border-radius: 8px; padding: 12px;
+    font: 12px/1.5 ui-monospace, monospace; resize: vertical;
+  }
+  button, label.file {
+    display: inline-block; background: #c8a96a; color: #1a150c; border: 0;
+    border-radius: 100px; padding: 9px 18px; font-weight: 600; cursor: pointer;
+    font-size: 14px;
+  }
+  button.ghost { background: transparent; color: #f5f2ec; border: 1px solid #34343a; }
+  input[type=file] { display: none; }
+  .hint { font-size: 13px; color: #9a958c; margin-top: 10px; }
+  code { color: #c8a96a; }
+</style>
+</head>
+<body>
+<h1>Mark licence plates</h1>
+<p>
+  Open your photos, drag a box over every visible plate, then paste the JSON into
+  <code>public/gallery/redactions.json</code> and run <code>npm run optimise-assets</code>.
+  Click a box to remove it. Photos with no plate still need an entry — that is how
+  the optimiser knows someone actually looked.
+</p>
+
+<p>
+  <label class="file">Open photos<input id="files" type="file" accept="image/*" multiple /></label>
+  <button class="ghost" id="next">Next photo →</button>
+  <button class="ghost" id="noplate">No plate in this one</button>
+</p>
+
+<div class="row">
+  <div>
+    <div class="stage" id="stage"></div>
+    <div class="hint" id="status">No photo open.</div>
+  </div>
+  <aside>
+    <textarea id="out" spellcheck="false" readonly>{}</textarea>
+    <p><button id="copy">Copy JSON</button></p>
+    <div class="hint">
+      Boxes are stored as <code>[x, y, width, height]</code>, each 0–1 relative to
+      the image, so they survive resizing.
+    </div>
+  </aside>
+</div>
+
+<script>
+  const stage = document.getElementById("stage");
+  const out = document.getElementById("out");
+  const status = document.getElementById("status");
+  const result = {};
+  let queue = [], index = -1, img = null, current = [];
+
+  const round = (n) => Math.round(n * 10000) / 10000;
+
+  function render() {
+    out.value = JSON.stringify(result, null, 2);
+    [...stage.querySelectorAll(".box")].forEach((b) => b.remove());
+    if (!img) return;
+    current.forEach((box, i) => {
+      const el = document.createElement("div");
+      el.className = "box";
+      el.style.left = box[0] * img.clientWidth + "px";
+      el.style.top = box[1] * img.clientHeight + "px";
+      el.style.width = box[2] * img.clientWidth + "px";
+      el.style.height = box[3] * img.clientHeight + "px";
+      el.title = "Click to remove";
+      el.onclick = (e) => { e.stopPropagation(); current.splice(i, 1); commit(); };
+      stage.appendChild(el);
+    });
+  }
+
+  function commit() {
+    if (!img) return;
+    result[img.dataset.name] = { plates: current.map((b) => b.map(round)) };
+    if (!current.length) result[img.dataset.name].note = "no plate visible";
+    render();
+  }
+
+  function show(i) {
+    if (i < 0 || i >= queue.length) return;
+    index = i;
+    const file = queue[i];
+    const url = URL.createObjectURL(file);
+    stage.innerHTML = "";
+    img = document.createElement("img");
+    img.src = url;
+    img.dataset.name = file.name;
+    img.onload = () => { current = result[file.name]?.plates ?? []; render(); };
+    stage.appendChild(img);
+    status.textContent = `${file.name} — ${i + 1} of ${queue.length}. Drag over each plate.`;
+
+    let start = null, ghost = null;
+    img.onpointerdown = (e) => {
+      const r = img.getBoundingClientRect();
+      start = [e.clientX - r.left, e.clientY - r.top];
+      ghost = document.createElement("div");
+      ghost.className = "box";
+      stage.appendChild(ghost);
+      img.setPointerCapture(e.pointerId);
+    };
+    img.onpointermove = (e) => {
+      if (!start || !ghost) return;
+      const r = img.getBoundingClientRect();
+      const x = e.clientX - r.left, y = e.clientY - r.top;
+      Object.assign(ghost.style, {
+        left: Math.min(start[0], x) + "px",
+        top: Math.min(start[1], y) + "px",
+        width: Math.abs(x - start[0]) + "px",
+        height: Math.abs(y - start[1]) + "px",
+      });
+    };
+    img.onpointerup = (e) => {
+      if (!start || !ghost) return;
+      const r = img.getBoundingClientRect();
+      const x = e.clientX - r.left, y = e.clientY - r.top;
+      const w = Math.abs(x - start[0]), h = Math.abs(y - start[1]);
+      ghost.remove(); ghost = null;
+      // Ignore stray clicks; a real plate box is never a few pixels.
+      if (w > 6 && h > 6) {
+        current.push([
+          Math.min(start[0], x) / img.clientWidth,
+          Math.min(start[1], y) / img.clientHeight,
+          w / img.clientWidth,
+          h / img.clientHeight,
+        ]);
+        commit();
+      }
+      start = null;
+    };
+  }
+
+  document.getElementById("files").onchange = (e) => {
+    queue = [...e.target.files];
+    if (queue.length) show(0);
+  };
+  document.getElementById("next").onclick = () => show(index + 1);
+  document.getElementById("noplate").onclick = () => { current = []; commit(); };
+  document.getElementById("copy").onclick = async () => {
+    await navigator.clipboard.writeText(out.value);
+    const b = document.getElementById("copy");
+    b.textContent = "Copied ✓";
+    setTimeout(() => (b.textContent = "Copy JSON"), 1500);
+  };
+</script>
+</body>
+</html>
