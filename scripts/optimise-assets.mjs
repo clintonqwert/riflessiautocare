@@ -82,18 +82,38 @@ for (const target of TARGETS) {
     if (!fs.existsSync(original)) fs.copyFileSync(live, original);
 
     const source = fs.readFileSync(original);
-    const meta = await sharp(source).metadata();
+    const { exif } = await sharp(source).metadata();
     const boxes = manifest[file]?.plates ?? [];
 
-    if ((meta.width ?? 0) < target.width * 0.75) {
+    // Phone cameras leave the pixels as the sensor read them and record which
+    // way up the photo was held in an EXIF orientation tag. We strip EXIF below
+    // — it is what carries GPS — so that instruction has to be baked into the
+    // pixels first or every sideways shot ships sideways. rotate() with no
+    // argument does exactly that, and is a no-op on an already-upright file.
+    //
+    // It has to happen before the crop as well as before the strip: an upright
+    // photo held in portrait is a *taller* image than its stored pixels claim,
+    // and cropping it as landscape would take the band across the middle of the
+    // wrong axis.
+    const { data: upright, info: meta } = await sharp(source)
+      .rotate()
+      .toBuffer({ resolveWithObject: true });
+
+    if (meta.width < target.width * 0.75) {
       problems.push(
         `${file} is only ${meta.width}px wide — it will look soft. Re-export at ${target.width}px or larger.`,
       );
     }
 
+    if (meta.height > meta.width && target.width > target.height) {
+      problems.push(
+        `${file} is portrait (${meta.width}×${meta.height}) but the layout is landscape — the crop keeps a band across the middle and drops the top and bottom. Re-shoot or re-crop it landscape if the car is losing its roof or wheels.`,
+      );
+    }
+
     // withMetadata() is deliberately never called — that is what would carry
     // EXIF, and with it GPS, into the published file.
-    let buffer = await sharp(source)
+    let buffer = await sharp(upright)
       .resize(target.width, target.height, {
         fit: "cover",
         position: "centre",
@@ -110,7 +130,7 @@ for (const target of TARGETS) {
 
     const kb = (n) => `${(n / 1024).toFixed(0)} KB`;
     const notes = [
-      meta.exif ? "EXIF stripped" : null,
+      exif ? "EXIF stripped" : null,
       boxes.length ? `${boxes.length} plate${boxes.length > 1 ? "s" : ""} blurred` : null,
     ].filter(Boolean);
     console.log(
