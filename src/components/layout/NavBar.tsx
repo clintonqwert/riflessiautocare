@@ -152,7 +152,12 @@ export function NavBar() {
       {/* Mobile drawer */}
       {isMenuOpen && (
         <div
-          className="fixed inset-0 z-40 lg:hidden"
+          // Above the sticky header (z-50) and the mobile book bar (z-40), and
+          // below the skip link (z-100). At z-40 the header painted straight
+          // over the open drawer: two wordmarks on the same line, and the
+          // hamburger sitting exactly on top of the drawer's own close button,
+          // swallowing the tap meant for it.
+          className="fixed inset-0 z-[60] lg:hidden"
           aria-modal="true"
           role="dialog"
           aria-label="Navigation menu"

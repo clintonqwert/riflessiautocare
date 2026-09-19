@@ -5,10 +5,12 @@ import { getGalleryItems } from "@/lib/content/gallery";
 import { getShowcase } from "@/lib/content/showcase";
 import { SERVICE_LABELS } from "@/types/content";
 import { PageHero } from "@/components/shared/PageHero";
+import { FilmHero } from "@/components/shared/FilmHero";
 import { JsonLd } from "@/components/shared/JsonLd";
 import { CTABand } from "@/components/shared/CTABand";
 import { BeforeAfterSlider } from "@/components/shared/BeforeAfterSlider";
 import { ShowcaseCarousel } from "@/components/shared/ShowcaseCarousel";
+import { getDemoFilm } from "@/lib/content/film";
 
 export const metadata: Metadata = buildMetadata({
   title: `Detailing Gallery — Before & After | ${SITE_NAME}`,
@@ -20,6 +22,14 @@ export const metadata: Metadata = buildMetadata({
 export default function GalleryPage() {
   const items = getGalleryItems();
   const showcase = getShowcase();
+  const film = getDemoFilm();
+
+  const heroText = {
+    eyebrow: "Il Lavoro",
+    heading: "Judged in the same daylight it was finished in.",
+    subheading:
+      "Drag any photo to wipe between before and after. Both frames are shot from one position and left unedited — paint either reflects properly or it doesn't, and moving the handle is the whole argument.",
+  };
 
   return (
     <>
@@ -29,11 +39,9 @@ export default function GalleryPage() {
           { name: "Gallery", path: "/gallery" },
         ])}
       />
-      <PageHero
-        eyebrow="Il Lavoro"
-        heading="Judged in the same daylight it was finished in."
-        subheading="Drag any photo to wipe between before and after. Both frames are shot from one position and left unedited — paint either reflects properly or it doesn't, and moving the handle is the whole argument."
-      />
+      {/* The film opens the page when one has been supplied; without it the
+          page falls back to the type-only hero and reads exactly as before. */}
+      {film ? <FilmHero {...heroText} film={film} note={film.note} /> : <PageHero {...heroText} />}
 
       <section className="bg-surface pb-24 md:pb-32" aria-label="Before and after work">
         <div className="mx-auto max-w-container px-5 md:px-8">
@@ -47,7 +55,9 @@ export default function GalleryPage() {
                 <BeforeAfterSlider
                   item={item}
                   sizes="(min-width: 768px) 50vw, 100vw"
-                  priority={i === 0}
+                  // The film hero owns the fold when there is one, so the
+                  // first pair only earns a preload without it.
+                  priority={!film && i === 0}
                 />
                 <Link
                   href={`/services/${item.service}`}
