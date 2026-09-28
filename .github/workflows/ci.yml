@@ -26,6 +26,9 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      - name: Test
+        run: npm test
+
       # Only the build evaluates src/lib/seo.ts, which throws in production
       # builds without this var. The value here just has to be a valid origin
       # for metadata output — keep it in sync with _siteUrlFallback there.

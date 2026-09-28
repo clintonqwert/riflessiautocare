@@ -9,6 +9,7 @@
 | Validation | Zod in the booking Server Action |
 | Lead delivery | CRM webhook through `src/lib/crm.ts` |
 | SEO | Central metadata and JSON-LD builders, sitemap, robots, and Open Graph image |
+| Testing | Vitest unit tests (`src/**/*.test.ts`), run in CI |
 | Hosting and telemetry | Vercel, Vercel Analytics, Vercel Speed Insights |
 
 Do not add a CMS, client-state library, scheduling service, or large UI library without a concrete operating requirement.
