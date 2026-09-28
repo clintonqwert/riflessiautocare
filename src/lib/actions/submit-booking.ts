@@ -2,12 +2,9 @@
 
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { sendToCrm } from "@/lib/crm";
-import { CONTACT_EMAIL } from "@/lib/content/site";
+import { deliverLead, fieldErrors, timingSpamReason } from "@/lib/leads";
+import { SERVICE_LABELS, VEHICLE_SIZE_LABELS } from "@/types/content";
 import { SERVICE_OPTIONS, VEHICLE_SIZES, type BookingFormValues, type FormResult } from "@/types/forms";
-
-/** Minimum ms between form render and submit — bots fill instantly. */
-const MIN_TIME_TO_SUBMIT_MS = 3000;
 
 /**
  * Shown when the lead could not be handed off. The form pairs this with a
@@ -33,23 +30,6 @@ const bookingSchema = z.object({
   preferredDate: z.string().trim().min(1, "Pick a preferred drop-off day."),
   notes: z.string().trim().optional(),
 });
-
-/**
- * Timing check on the hidden `startedAt` stamp.
- *
- * A missing or zero stamp is spam, not a real visitor: the stamp is written
- * on hydration, and this form only submits through the hydrated action, so a
- * genuine submission always carries one. (`Number("")` is 0 and slips past a
- * bare finite check — that was the bug.) If this form is ever made to work
- * without JS, revisit: an empty stamp would then be a real lead.
- */
-function timingSpamReason(raw: FormDataEntryValue | null): string | null {
-  if (typeof raw !== "string" || raw.trim() === "") return "no-timestamp";
-  const startedAt = Number(raw);
-  if (!Number.isFinite(startedAt) || startedAt <= 0) return "bad-timestamp";
-  if (Date.now() - startedAt < MIN_TIME_TO_SUBMIT_MS) return "too-fast";
-  return null;
-}
 
 export async function submitBooking(
   _prevState: FormResult | null,
@@ -81,12 +61,7 @@ export async function submitBooking(
   });
 
   if (!parsed.success) {
-    const errors: Record<string, string> = {};
-    for (const issue of parsed.error.issues) {
-      const field = String(issue.path[0] ?? "form");
-      errors[field] ??= issue.message;
-    }
-    return { ok: false, errors, values: submittedValues };
+    return { ok: false, errors: fieldErrors(parsed.error), values: submittedValues };
   }
 
   if (spamReason) {
@@ -99,8 +74,12 @@ export async function submitBooking(
     redirect("/thank-you");
   }
 
-  const delivered = await deliverLead({
+  const delivered = await deliverLead("booking", {
+    // Formspree uses `subject` as the email's subject line and `email` as its Reply-To.
+    subject: `Booking request — ${parsed.data.name}`,
     ...parsed.data,
+    service: SERVICE_LABELS[parsed.data.service],
+    vehicleSize: VEHICLE_SIZE_LABELS[parsed.data.vehicleSize],
     source: "booking-form",
     submittedAt: new Date().toISOString(),
   });
@@ -114,39 +93,4 @@ export async function submitBooking(
   }
 
   redirect("/thank-you");
-}
-
-/**
- * Hands the lead to the CRM webhook. Returns false only when the lead is
- * genuinely unaccounted for — the caller then tells the visitor rather than
- * showing a confirmation for something that never arrived.
- */
-async function deliverLead(payload: Record<string, unknown>): Promise<boolean> {
-  const webhookUrl = process.env.BOOKING_WEBHOOK_URL;
-
-  if (webhookUrl) {
-    if (await sendToCrm(webhookUrl, payload)) return true;
-    console.error(
-      "[booking] webhook delivery failed after retries; lead:",
-      JSON.stringify(payload),
-    );
-    return false;
-  }
-
-  if (process.env.NODE_ENV === "production") {
-    // Misconfigured production: every lead would vanish into the logs.
-    console.error(
-      `[booking] BOOKING_WEBHOOK_URL is not set — lead NOT delivered, visitor sent to ${CONTACT_EMAIL}; lead:`,
-      JSON.stringify(payload),
-    );
-    return false;
-  }
-
-  // Local/preview without a webhook: keep the lead readable and let the
-  // happy path work end to end.
-  console.warn(
-    "[booking] BOOKING_WEBHOOK_URL not set (non-production); lead:",
-    JSON.stringify(payload),
-  );
-  return true;
 }

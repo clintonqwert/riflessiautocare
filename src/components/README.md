@@ -7,12 +7,12 @@ Presentation layer only — **components never fetch data**. Pages (in
 |---|---|---|
 | `layout/` | NavBar, SiteFooter, StickyBookBar | NavBar only |
 | `home/` | Homepage sections | No |
-| `forms/` | BookingForm (submits via Server Action) | Yes |
+| `forms/` | BookingForm, ContactForm (submit via Server Actions), FormParts | Yes |
 | `shared/` | Cross-page fragments (PageHero, CTABand, FAQSection, MediaFrame, StatsBand…) | CountUp + ScrollReveal only |
 | `ui/` | Primitives (button recipe, Card, field recipes, icons, SectionHeading) | No |
 
 - `home/`/`shared/` may import from `ui/`; `ui/` never imports upward.
-- `"use client"` appears **only** in: NavBar, BookingForm, ScrollReveal,
+- `"use client"` appears **only** in: NavBar, the `forms/` files, ScrollReveal,
   CountUp. Never on a section or page.
 - No hex colors in JSX — design tokens live in `app/globals.css`; raw hex is
   confined to `lib/design-tokens.ts` consumers (opengraph-image).

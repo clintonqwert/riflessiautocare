@@ -1,8 +1,16 @@
 # Riflessi decision log
 
+## 2026-09-28 — Formspree delivers booking and contact leads
+
+**Decision:** Deliver both forms through the owner's Formspree form endpoints, one per form, set as `BOOKING_WEBHOOK_URL` and `CONTACT_WEBHOOK_URL`. The Server Actions post to them server-side. Add a "Questions first?" contact form below the booking form on `/contact`.
+
+**Reason:** Formspree emails each submission to the business inbox with no backend to run. Posting from the Server Action keeps Zod validation, the spam gate, retries, and the fail-loud mailto fallback in one place. Formspree's `email` field becomes the Reply-To and `subject` the subject line, so the owner can reply straight from the inbox.
+
+**Consequence:** A missing endpoint in production makes that form fail loud rather than lose leads. Formspree's own plan limits and spam filtering now apply to every lead. Moving to a CRM later means changing the webhook URL and payload, not the forms.
+
 ## 2026-09-28 — Vitest for unit tests; CI gates lint, typecheck, test, and build
 
-**Decision:** Adopt Vitest for unit tests of pure logic, and run `npm test` in CI between typecheck and build. This supersedes the "lint, typecheck, and build only" gate below. Its first suite covers the booking form's fallback mailto link (`src/lib/booking-mailto.test.ts`).
+**Decision:** Adopt Vitest for unit tests of pure logic, and run `npm test` in CI between typecheck and build. This supersedes the "lint, typecheck, and build only" gate below. Its first suite covers the booking form's fallback mailto link (`src/lib/mailto.test.ts`).
 
 **Reason:** The fallback link's encoding had already regressed once (spaces written as "+"), and the fix depends on details a later cleanup could quietly undo. Vitest is the runner the Next.js docs set up. Vite 8 resolves the `@/*` alias from `tsconfig.json` itself, so the setup needs one dev dependency and a five-line config.
 

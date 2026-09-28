@@ -1,4 +1,4 @@
-/** Form data contracts shared by the booking form and its Server Action. */
+/** Form data contracts shared by the booking and contact forms and their Server Actions. */
 
 import { SERVICE_SLUGS, VEHICLE_SIZES, type ServiceSlug } from "@/types/content";
 
@@ -18,6 +18,13 @@ export interface BookingFormValues {
   notes: string;
 }
 
-export type FormResult =
+/** Safe-to-echo values from the contact form (excludes honeypot/startedAt). */
+export interface ContactFormValues {
+  name: string;
+  email: string;
+  message: string;
+}
+
+export type FormResult<Values = BookingFormValues> =
   | { ok: true }
-  | { ok: false; errors: Record<string, string>; values: BookingFormValues };
+  | { ok: false; errors: Record<string, string>; values: Values };

@@ -7,7 +7,7 @@
 | Cinema | React Three Fiber, Three.js, GSAP, and Lenis as capability-gated enhancement |
 | Content | Typed accessor modules in `src/lib/content/` |
 | Validation | Zod in the booking Server Action |
-| Lead delivery | CRM webhook through `src/lib/crm.ts` |
+| Lead delivery | Formspree form endpoints, posted server-side through `src/lib/crm.ts` |
 | SEO | Central metadata and JSON-LD builders, sitemap, robots, and Open Graph image |
 | Testing | Vitest unit tests (`src/**/*.test.ts`), run in CI |
 | Hosting and telemetry | Vercel, Vercel Analytics, Vercel Speed Insights |
