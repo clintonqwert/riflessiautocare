@@ -9,7 +9,7 @@ Presentation layer only — **components never fetch data**. Pages (in
 | `home/` | Homepage sections | No |
 | `forms/` | BookingForm, ContactForm (submit via Server Actions), FormParts | Yes |
 | `shared/` | Cross-page fragments (PageHero, CTABand, FAQSection, MediaFrame, StatsBand…) | CountUp + ScrollReveal only |
-| `ui/` | Primitives (button recipe, Card, field recipes, icons, SectionHeading) | No |
+| `ui/` | Primitives (button recipe, Card, field recipes, icons, SectionHeading, RiflessiMark, Wordmark) | No |
 
 - `home/`/`shared/` may import from `ui/`; `ui/` never imports upward.
 - `"use client"` appears **only** in: NavBar, the `forms/` files, ScrollReveal,

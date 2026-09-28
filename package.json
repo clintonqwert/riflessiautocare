@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
-    "optimise-assets": "node scripts/optimise-assets.mjs"
+    "optimise-assets": "node scripts/optimise-assets.mjs",
+    "brand-icons": "node scripts/build-brand-icons.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

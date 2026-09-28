@@ -6,7 +6,8 @@
  *
  * MIRROR: these hex values duplicate the `@theme` block in
  * src/app/globals.css. Change a hex there → change it here in the same
- * commit, or the OG image drifts from the site palette.
+ * commit, or the OG image drifts from the site palette. `surface` and `fg`
+ * are also copied into scripts/build-brand-icons.mjs (re-run it after).
  */
 export const NERO = {
   surface: "#0a0a0b",
