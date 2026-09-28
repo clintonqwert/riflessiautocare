@@ -38,11 +38,11 @@ function fallbackMailto(values: BookingFormValues | undefined): string {
     `Preferred drop-off day: ${values?.preferredDate ?? ""}`,
     `Notes: ${values?.notes ?? ""}`,
   ];
-  const query = new URLSearchParams({
-    subject: "Booking request",
-    body: `${lines.join("\n")}\n`,
-  });
-  return `mailto:${CONTACT_EMAIL}?${query.toString()}`;
+  // mailto: is percent-encoded (RFC 6068); URLSearchParams writes spaces as
+  // "+", which mail apps show literally.
+  const subject = encodeURIComponent("Booking request");
+  const body = encodeURIComponent(`${lines.join("\n")}\n`);
+  return `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
 }
 
 export function BookingForm() {
