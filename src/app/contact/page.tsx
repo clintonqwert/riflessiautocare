@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { buildMetadata, SITE_NAME } from "@/lib/seo";
 import { PageHero } from "@/components/shared/PageHero";
 import { BookingForm } from "@/components/forms/BookingForm";
+import { ContactForm } from "@/components/forms/ContactForm";
 import { Card } from "@/components/ui/Card";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 import { IconKey, IconMapPin, IconClock } from "@/components/ui/icons";
 import { BAY_FACTS, BOOKING_RESPONSE_PROMISE } from "@/lib/content/site";
 
@@ -61,6 +63,25 @@ export default function ContactPage() {
                 );
               })}
             </aside>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-raised py-24 md:py-32" aria-labelledby="questions-heading">
+        <div className="mx-auto max-w-container px-5 md:px-8">
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-5 lg:gap-16">
+            <SectionHeading
+              id="questions-heading"
+              eyebrow="Domande"
+              heading="Questions first?"
+              lede="Not ready to pick a day? Ask about a service, your car, or how drop-off works."
+              className="lg:col-span-2"
+            />
+            <div className="lg:col-span-3">
+              <Card className="p-6 md:p-8">
+                <ContactForm />
+              </Card>
+            </div>
           </div>
         </div>
       </section>

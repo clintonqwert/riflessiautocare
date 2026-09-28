@@ -1,49 +1,28 @@
 "use client";
 
-import { useActionState, useEffect, useRef } from "react";
+import { useActionState } from "react";
 import { submitBooking } from "@/lib/actions/submit-booking";
-import { SERVICE_OPTIONS, VEHICLE_SIZES } from "@/types/forms";
-import type { FormResult } from "@/types/forms";
+import { FREE_TEXT_MAX_LABEL, SERVICE_OPTIONS, VEHICLE_SIZES } from "@/types/forms";
+import type { BookingFormValues, FormResult } from "@/types/forms";
 import { SERVICE_LABELS, VEHICLE_SIZE_LABELS } from "@/types/content";
 import { CONTACT_EMAIL } from "@/lib/content/site";
-import { bookingMailto } from "@/lib/booking-mailto";
-import { inputBase, inputError, labelBase, errorBanner, errorText } from "@/components/ui/field";
+import { bookingMailto } from "@/lib/mailto";
+import { inputBase, inputError, labelBase, errorBanner } from "@/components/ui/field";
 import { buttonClasses } from "@/components/ui/button";
-
-function FieldError({ id, message }: { id: string; message?: string }) {
-  if (!message) return null;
-  return (
-    <p id={id} role="alert" className={errorText}>
-      {message}
-    </p>
-  );
-}
+import { FieldError, SpamGuards } from "@/components/forms/FormParts";
 
 export function BookingForm() {
-  const [state, formAction, isPending] = useActionState<FormResult | null, FormData>(
+  const [state, formAction, isPending] = useActionState<FormResult<BookingFormValues> | null, FormData>(
     submitBooking,
     null,
   );
-
-  const startedAtRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (startedAtRef.current) {
-      startedAtRef.current.value = String(Date.now());
-    }
-  }, []);
 
   const errors = state && !state.ok ? state.errors : {};
   const values = state && !state.ok ? state.values : undefined;
 
   return (
     <form action={formAction} noValidate className="flex flex-col gap-5">
-      {/* Spam: honeypot */}
-      <div aria-hidden="true" className="hidden" tabIndex={-1}>
-        <input name="website" type="text" autoComplete="off" tabIndex={-1} />
-      </div>
-      {/* Spam: time-to-submit */}
-      <input ref={startedAtRef} type="hidden" name="startedAt" />
+      <SpamGuards />
 
       {/* Name */}
       <div>
@@ -209,8 +188,14 @@ export function BookingForm() {
           rows={4}
           placeholder="Pet hair in the back, water spots on the hood, a stain on the passenger seat…"
           defaultValue={values?.notes}
-          className={`${inputBase} min-h-[100px] resize-y`}
+          className={`${inputBase} min-h-[100px] resize-y ${errors.notes ? inputError : ""}`}
+          aria-describedby={errors.notes ? "bf-notes-hint bf-notes-error" : "bf-notes-hint"}
+          aria-invalid={Boolean(errors.notes)}
         />
+        <p id="bf-notes-hint" className="mt-1.5 text-xs text-muted">
+          Up to {FREE_TEXT_MAX_LABEL} characters.
+        </p>
+        <FieldError id="bf-notes-error" message={errors.notes} />
       </div>
 
       {/* Only a failed hand-off sets `errors.form`, so the fallback always applies. */}

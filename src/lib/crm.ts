@@ -3,7 +3,8 @@ import "server-only";
 /**
  * CRM webhook client (handoff doc §9).
  *
- * Phase 1: direct POST to a CRM webhook with retry.
+ * Phase 1: direct POST to a CRM webhook with retry. Today the webhooks are
+ * Formspree form endpoints (see src/lib/leads.ts), which reply in JSON.
  * Phase 3: this becomes a POST to API Gateway → SQS (§13.3) — callers
  * (the Server Actions) keep the same interface.
  */
@@ -35,7 +36,7 @@ export async function sendToCrm(
     try {
       const res = await fetch(webhookUrl, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify(payload),
         signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       });

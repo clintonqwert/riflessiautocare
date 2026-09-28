@@ -11,7 +11,7 @@
 
 ## Engineering protection
 
-1. Add focused tests around booking validation, spam detection, and webhook retry behavior. Vitest is set up; `src/lib/booking-mailto.test.ts` shows the pattern.
+1. Add focused tests around booking validation, spam detection, and webhook retry behavior. Vitest is set up; `src/lib/mailto.test.ts` shows the pattern.
 2. Add a `lighthouserc.json` and a Lighthouse step to CI so the documented budget is enforced rather than described. Driftpilot's config is the reference.
 3. Add a scoped Content-Security-Policy — the 3D stage and the analytics scripts determine what it can allow.
 

@@ -1,8 +1,22 @@
 # Riflessi decision log
 
+## 2026-09-28 — Formspree delivers booking and contact leads
+
+**Decision:** Deliver both forms through the owner's Formspree form endpoints, one per form, set as `BOOKING_WEBHOOK_URL` and `CONTACT_WEBHOOK_URL`. The Server Actions post to them server-side. Add a "Questions first?" contact form below the booking form on `/contact`.
+
+**Reason:** Formspree emails each submission to the business inbox with no backend to run. Posting from the Server Action keeps Zod validation, the spam gate, retries, and the fail-loud mailto fallback in one place. Formspree's `email` field becomes the Reply-To and `subject` the subject line, so the owner can reply straight from the inbox.
+
+**Consequence:** A missing endpoint in production makes that form fail loud rather than lose leads. Formspree's own plan limits and spam filtering now apply to every lead. Moving to a CRM later means changing the webhook URL and `toWebhookPayload` in `src/lib/leads.ts`, not the forms. The privacy policy names Formspree and its US storage.
+
+Owner choices made with it (2026-09-28):
+
+- **Spam filter:** Formspree can flag a real lead as spam. The visitor then sees a success message and no email is sent, and the API can't tell us. The owner checks the Formspree spam tab weekly until there is a track record, rather than paying for the plan that allows "Relaxed" filtering.
+- **Free-text limit:** the contact message and booking notes are capped at 2,000 characters.
+- **Previews:** without the webhook variables, Vercel previews log the lead and show success, like local dev. Only the live site (`VERCEL_ENV=production`) fails loud.
+
 ## 2026-09-28 — Vitest for unit tests; CI gates lint, typecheck, test, and build
 
-**Decision:** Adopt Vitest for unit tests of pure logic, and run `npm test` in CI between typecheck and build. This supersedes the "lint, typecheck, and build only" gate below. Its first suite covers the booking form's fallback mailto link (`src/lib/booking-mailto.test.ts`).
+**Decision:** Adopt Vitest for unit tests of pure logic, and run `npm test` in CI between typecheck and build. This supersedes the "lint, typecheck, and build only" gate below. Its first suite covers the booking form's fallback mailto link (`src/lib/mailto.test.ts`).
 
 **Reason:** The fallback link's encoding had already regressed once (spaces written as "+"), and the fix depends on details a later cleanup could quietly undo. Vitest is the runner the Next.js docs set up. Vite 8 resolves the `@/*` alias from `tsconfig.json` itself, so the setup needs one dev dependency and a five-line config.
 

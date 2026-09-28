@@ -21,8 +21,8 @@ export interface LegalSection {
 }
 
 /** Keep both in sync — ISO drives <time dateTime>, display drives the text. */
-export const LEGAL_LAST_UPDATED_ISO = "2026-07-27";
-export const LEGAL_LAST_UPDATED_DISPLAY = "July 27, 2026";
+export const LEGAL_LAST_UPDATED_ISO = "2026-09-28";
+export const LEGAL_LAST_UPDATED_DISPLAY = "September 28, 2026";
 
 const privacySections: LegalSection[] = [
   {
@@ -34,7 +34,8 @@ const privacySections: LegalSection[] = [
   {
     heading: "What you give us",
     paragraphs: [
-      "The booking form is the only place this site asks you for personal information. When you submit it, these details are collected:",
+      "This site asks for personal information in two places, both on the booking page: the booking form and the “Questions first?” contact form.",
+      "The contact form collects your name, your email address, and your question. The booking form collects:",
     ],
     bullets: [
       "Your name",
@@ -47,15 +48,15 @@ const privacySections: LegalSection[] = [
   {
     heading: "Why it is collected",
     paragraphs: [
-      "Solely to answer your booking request: to confirm or propose a drop-off day, share the drop-off address once a booking is confirmed, and reach you about your vehicle while it is in the bay.",
-      "Your details are not sold, rented, or traded. They are not used for advertising, and you will not be added to a marketing list because you asked about a detail.",
+      "Solely to answer your booking request or question: to reply to you, confirm or propose a drop-off day, share the drop-off address once a booking is confirmed, and reach you about your vehicle while it is in the bay.",
+      "Your details are not sold, rented, or traded. They are not used for advertising, and you will not be added to a marketing list because you asked a question or booked a detail.",
     ],
   },
   {
     heading: "Where it goes",
     paragraphs: [
-      "Booking submissions are transmitted over an encrypted connection to the booking inbox used to manage appointments. They may also appear in server logs kept by the site host as part of normal operation.",
-      "This site is hosted on Vercel, which processes requests and stores operational logs on our behalf. No other party receives your booking details.",
+      "Both forms send your details over an encrypted connection to Formspree (Formspree, Inc.), a form-handling service that emails each submission to the inbox used to manage appointments and questions. Formspree also keeps a copy of each submission for as long as the business's Formspree account is active. It runs on infrastructure in the United States, so your details are stored and processed outside Canada. Formspree's own privacy policy is at formspree.io/legal/privacy.",
+      "This site is hosted on Vercel, which processes requests and stores operational logs on our behalf. Your details may appear in those logs as part of normal operation. Apart from Formspree and Vercel, no other party receives them.",
     ],
   },
   {
@@ -68,8 +69,11 @@ const privacySections: LegalSection[] = [
   {
     heading: "How long it is kept",
     paragraphs: [
-      "Booking requests are kept for as long as needed to serve the appointment and to hold a basic record of work performed on your vehicle. Requests that never turn into a booking are cleared out once they are clearly stale.",
+      "Booking requests and questions are kept for as long as needed to answer them, serve the appointment, and hold a basic record of work performed on your vehicle. Requests that never turn into a booking are cleared out once they are clearly stale.",
+      "The copy Formspree keeps is held on Formspree's terms: for as long as the business's Formspree account is active.",
       // TODO(owner): set a concrete retention period (e.g. 24 months) and state it here.
+      // TODO(owner): if submissions can be deleted in the Formspree dashboard,
+      // commit to clearing that copy too and say so here instead.
     ],
   },
   {
@@ -82,13 +86,14 @@ const privacySections: LegalSection[] = [
   {
     heading: "Security",
     paragraphs: [
-      "The site is served over HTTPS and booking submissions are encrypted in transit. No system is perfectly secure, so please do not send payment card numbers or government ID through the booking form — they are never needed to book a detail.",
+      "The site is served over HTTPS and booking submissions are encrypted in transit. No system is perfectly secure, so please do not send payment card numbers or government ID through either form — they are never needed to book a detail.",
     ],
   },
   {
     heading: "Changes",
     paragraphs: [
-      "If this policy changes, the revised version is posted here with a new date at the top. Material changes to how booking information is handled will be described rather than quietly edited in.",
+      "If this policy changes, the revised version is posted here with a new date at the top. Material changes to how the information you send is handled will be described rather than quietly edited in.",
+      "September 28, 2026: a contact form was added, and both forms now deliver through Formspree (see “Where it goes”).",
     ],
   },
 ];

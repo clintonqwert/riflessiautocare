@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { bookingMailto, MAILTO_MAX_LENGTH, NOTES_CUT_MARKER } from "@/lib/booking-mailto";
+import { bookingMailto, contactMailto, CUT_MARKER, MAILTO_MAX_LENGTH } from "@/lib/mailto";
 import { CONTACT_EMAIL } from "@/lib/content/site";
 import { SERVICE_LABELS, VEHICLE_SIZE_LABELS } from "@/types/content";
-import type { BookingFormValues } from "@/types/forms";
+import type { BookingFormValues, ContactFormValues } from "@/types/forms";
 
 /** Reads a link the way a mail app does (RFC 6068): percent-decoding only, so "+" stays "+". */
 function openMailto(href: string) {
@@ -84,10 +84,38 @@ describe("bookingMailto", () => {
 
     expect(href.length).toBeLessThanOrEqual(MAILTO_MAX_LENGTH);
     const kept = notesIn(openMailto(href).body);
-    expect(kept.endsWith(`${NOTES_CUT_MARKER}\r\n`)).toBe(true);
-    const start = kept.slice(0, kept.indexOf(NOTES_CUT_MARKER));
+    expect(kept.endsWith(`${CUT_MARKER}\r\n`)).toBe(true);
+    const start = kept.slice(0, kept.indexOf(CUT_MARKER));
     expect(start.length).toBeGreaterThan(0);
     expect(notes.startsWith(start)).toBe(true);
     expect(start).not.toContain("�");
+  });
+});
+
+describe("contactMailto", () => {
+  const question: ContactFormValues = {
+    name: "Alex Rossi",
+    email: "alex@example.com",
+    message: "Do you coat wheels + calipers? Mine are 20\" & gloss black.\r\nThanks!",
+  };
+
+  it("pre-writes the name and message exactly", () => {
+    const mail = openMailto(contactMailto(question));
+
+    expect(mail.to).toBe(CONTACT_EMAIL);
+    expect(mail.subject).toBe("Question");
+    expect(mail.body).toBe(
+      'Name: Alex Rossi\r\nMessage: Do you coat wheels + calipers? Mine are 20" & gloss black.\r\nThanks!\r\n',
+    );
+  });
+
+  it("shortens a long message to fit the link", () => {
+    const message = "Which ceramic package suits a daily driver? ".repeat(100);
+    const href = contactMailto({ ...question, message });
+
+    expect(href.length).toBeLessThanOrEqual(MAILTO_MAX_LENGTH);
+    const { body } = openMailto(href);
+    expect(body.endsWith(`${CUT_MARKER}\r\n`)).toBe(true);
+    expect(message.startsWith(body.slice("Name: Alex Rossi\r\nMessage: ".length, body.indexOf(CUT_MARKER)))).toBe(true);
   });
 });

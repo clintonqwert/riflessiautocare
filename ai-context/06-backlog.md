@@ -7,7 +7,7 @@
 
 ## Engineering protection
 
-- Add focused booking pipeline tests: validation, spam gate, and webhook retry/timeout behavior — Vitest is set up; `src/lib/booking-mailto.test.ts` shows the pattern.
+- Add focused booking pipeline tests: validation, spam gate, and webhook retry/timeout behavior — Vitest is set up; `src/lib/mailto.test.ts` shows the pattern.
 - Add a `lighthouserc.json` and wire a Lighthouse step into CI; Driftpilot's config is the reference.
 - Add a scoped Content-Security-Policy.
 
