@@ -2,8 +2,8 @@
 
 import { useActionState } from "react";
 import { submitBooking } from "@/lib/actions/submit-booking";
-import { SERVICE_OPTIONS, VEHICLE_SIZES } from "@/types/forms";
-import type { FormResult } from "@/types/forms";
+import { FREE_TEXT_MAX_LABEL, SERVICE_OPTIONS, VEHICLE_SIZES } from "@/types/forms";
+import type { BookingFormValues, FormResult } from "@/types/forms";
 import { SERVICE_LABELS, VEHICLE_SIZE_LABELS } from "@/types/content";
 import { CONTACT_EMAIL } from "@/lib/content/site";
 import { bookingMailto } from "@/lib/mailto";
@@ -12,7 +12,7 @@ import { buttonClasses } from "@/components/ui/button";
 import { FieldError, SpamGuards } from "@/components/forms/FormParts";
 
 export function BookingForm() {
-  const [state, formAction, isPending] = useActionState<FormResult | null, FormData>(
+  const [state, formAction, isPending] = useActionState<FormResult<BookingFormValues> | null, FormData>(
     submitBooking,
     null,
   );
@@ -188,8 +188,14 @@ export function BookingForm() {
           rows={4}
           placeholder="Pet hair in the back, water spots on the hood, a stain on the passenger seat…"
           defaultValue={values?.notes}
-          className={`${inputBase} min-h-[100px] resize-y`}
+          className={`${inputBase} min-h-[100px] resize-y ${errors.notes ? inputError : ""}`}
+          aria-describedby={errors.notes ? "bf-notes-hint bf-notes-error" : "bf-notes-hint"}
+          aria-invalid={Boolean(errors.notes)}
         />
+        <p id="bf-notes-hint" className="mt-1.5 text-xs text-muted">
+          Up to {FREE_TEXT_MAX_LABEL} characters.
+        </p>
+        <FieldError id="bf-notes-error" message={errors.notes} />
       </div>
 
       {/* Only a failed hand-off sets `errors.form`, so the fallback always applies. */}

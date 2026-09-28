@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useRef } from "react";
 import { submitContact } from "@/lib/actions/submit-contact";
-import type { ContactFormValues, FormResult } from "@/types/forms";
+import { FREE_TEXT_MAX_LABEL, type ContactFormValues, type FormResult } from "@/types/forms";
 import { CONTACT_EMAIL } from "@/lib/content/site";
 import { contactMailto } from "@/lib/mailto";
 import { inputBase, inputError, labelBase, errorBanner } from "@/components/ui/field";
@@ -97,9 +97,12 @@ export function ContactForm() {
           placeholder="Ask about a service, your car, or how drop-off works…"
           defaultValue={values?.message}
           className={`${inputBase} min-h-[120px] resize-y ${errors.message ? inputError : ""}`}
-          aria-describedby={errors.message ? "cf-message-error" : undefined}
+          aria-describedby={errors.message ? "cf-message-hint cf-message-error" : "cf-message-hint"}
           aria-invalid={Boolean(errors.message)}
         />
+        <p id="cf-message-hint" className="mt-1.5 text-xs text-muted">
+          Up to {FREE_TEXT_MAX_LABEL} characters.
+        </p>
         <FieldError id="cf-message-error" message={errors.message} />
       </div>
 

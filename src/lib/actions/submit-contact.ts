@@ -2,7 +2,12 @@
 
 import { z } from "zod";
 import { deliverLead, fieldErrors, timingSpamReason } from "@/lib/leads";
-import type { ContactFormValues, FormResult } from "@/types/forms";
+import {
+  FREE_TEXT_MAX_LABEL,
+  FREE_TEXT_MAX_LENGTH,
+  type ContactFormValues,
+  type FormResult,
+} from "@/types/forms";
 
 /**
  * Shown when the message could not be handed off. The form pairs this with a
@@ -15,7 +20,11 @@ const DELIVERY_FAILED_MESSAGE =
 const contactSchema = z.object({
   name: z.string().trim().min(2, "Please enter your name."),
   email: z.email("Please enter a valid email address."),
-  message: z.string().trim().min(10, "Tell me a little more — a sentence or two is plenty."),
+  message: z
+    .string()
+    .trim()
+    .min(10, "Tell me a little more — a sentence or two is plenty.")
+    .max(FREE_TEXT_MAX_LENGTH, `Please keep your question to ${FREE_TEXT_MAX_LABEL} characters or fewer.`),
 });
 
 type ContactResult = FormResult<ContactFormValues>;
@@ -50,13 +59,7 @@ export async function submitContact(
     return { ok: true };
   }
 
-  const delivered = await deliverLead("contact", {
-    // Formspree uses `subject` as the email's subject line and `email` as its Reply-To.
-    subject: `Question — ${parsed.data.name}`,
-    ...parsed.data,
-    source: "contact-form",
-    submittedAt: new Date().toISOString(),
-  });
+  const delivered = await deliverLead({ kind: "contact", ...parsed.data });
 
   if (!delivered) {
     return { ok: false, errors: { form: DELIVERY_FAILED_MESSAGE }, values: submittedValues };

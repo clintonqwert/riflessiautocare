@@ -3,8 +3,14 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { deliverLead, fieldErrors, timingSpamReason } from "@/lib/leads";
-import { SERVICE_LABELS, VEHICLE_SIZE_LABELS } from "@/types/content";
-import { SERVICE_OPTIONS, VEHICLE_SIZES, type BookingFormValues, type FormResult } from "@/types/forms";
+import {
+  FREE_TEXT_MAX_LABEL,
+  FREE_TEXT_MAX_LENGTH,
+  SERVICE_OPTIONS,
+  VEHICLE_SIZES,
+  type BookingFormValues,
+  type FormResult,
+} from "@/types/forms";
 
 /**
  * Shown when the lead could not be handed off. The form pairs this with a
@@ -28,13 +34,19 @@ const bookingSchema = z.object({
   service: z.enum(SERVICE_OPTIONS, { error: "Please choose a service." }),
   vehicleSize: z.enum(VEHICLE_SIZES, { error: "Please choose a vehicle size." }),
   preferredDate: z.string().trim().min(1, "Pick a preferred drop-off day."),
-  notes: z.string().trim().optional(),
+  notes: z
+    .string()
+    .trim()
+    .max(FREE_TEXT_MAX_LENGTH, `Please keep your notes to ${FREE_TEXT_MAX_LABEL} characters or fewer.`)
+    .optional(),
 });
 
+type BookingResult = FormResult<BookingFormValues>;
+
 export async function submitBooking(
-  _prevState: FormResult | null,
+  _prevState: BookingResult | null,
   formData: FormData,
-): Promise<FormResult> {
+): Promise<BookingResult> {
   // Honeypot: unambiguous bot. Take the normal success path so detection is
   // never revealed, and deliver nothing.
   if (formData.get("website")) {
@@ -74,15 +86,7 @@ export async function submitBooking(
     redirect("/thank-you");
   }
 
-  const delivered = await deliverLead("booking", {
-    // Formspree uses `subject` as the email's subject line and `email` as its Reply-To.
-    subject: `Booking request — ${parsed.data.name}`,
-    ...parsed.data,
-    service: SERVICE_LABELS[parsed.data.service],
-    vehicleSize: VEHICLE_SIZE_LABELS[parsed.data.vehicleSize],
-    source: "booking-form",
-    submittedAt: new Date().toISOString(),
-  });
+  const delivered = await deliverLead({ kind: "booking", ...parsed.data });
 
   if (!delivered) {
     return {

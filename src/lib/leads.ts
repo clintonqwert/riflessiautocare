@@ -3,11 +3,19 @@ import "server-only";
 import type { ZodError } from "zod";
 import { sendToCrm } from "@/lib/crm";
 import { CONTACT_EMAIL } from "@/lib/content/site";
+import {
+  SERVICE_LABELS,
+  VEHICLE_SIZE_LABELS,
+  type ServiceSlug,
+  type VehicleSize,
+} from "@/types/content";
 
 /**
  * Spam gate and delivery shared by the form Server Actions (booking and
  * contact). Each kind of lead has its own webhook — today a Formspree form
- * endpoint — so bookings and questions arrive as separate forms.
+ * endpoint — so bookings and questions arrive as separate forms. Everything
+ * provider-specific lives in this file: switching provider means changing
+ * `toWebhookPayload` and the env vars, not the forms or their actions.
  */
 
 const WEBHOOK_ENV = {
@@ -15,7 +23,20 @@ const WEBHOOK_ENV = {
   contact: "CONTACT_WEBHOOK_URL",
 } as const;
 
-export type LeadKind = keyof typeof WEBHOOK_ENV;
+/** A validated submission, as each form's Server Action hands it over. */
+export type Lead =
+  | {
+      kind: "booking";
+      name: string;
+      email: string;
+      phone: string;
+      vehicle: string;
+      service: ServiceSlug;
+      vehicleSize: VehicleSize;
+      preferredDate: string;
+      notes?: string;
+    }
+  | { kind: "contact"; name: string; email: string; message: string };
 
 /** Minimum ms between form render and submit — bots fill instantly. */
 const MIN_TIME_TO_SUBMIT_MS = 3000;
@@ -47,16 +68,47 @@ export function fieldErrors(error: ZodError): Record<string, string> {
 }
 
 /**
+ * Shapes a lead for Formspree, which emails it to the business inbox:
+ * `subject` becomes the email's subject line and `email` its Reply-To, so the
+ * owner can answer straight from the inbox. Booking emails show the service
+ * and size labels the visitor picked, not slugs.
+ */
+function toWebhookPayload(lead: Lead): Record<string, unknown> {
+  const { kind, ...fields } = lead;
+  const stamp = { source: `${kind}-form`, submittedAt: new Date().toISOString() };
+
+  if (lead.kind === "booking") {
+    return {
+      subject: `Booking request — ${lead.name}`,
+      ...fields,
+      service: SERVICE_LABELS[lead.service],
+      vehicleSize: VEHICLE_SIZE_LABELS[lead.vehicleSize],
+      ...stamp,
+    };
+  }
+  return { subject: `Question — ${lead.name}`, ...fields, ...stamp };
+}
+
+/**
+ * True only on the live site. Vercel previews also run with
+ * NODE_ENV=production, so on Vercel the deployment's own VERCEL_ENV decides;
+ * anywhere else (e.g. a local `next start`) NODE_ENV does.
+ */
+function isLiveSite(): boolean {
+  const vercelEnv = process.env.VERCEL_ENV;
+  return vercelEnv ? vercelEnv === "production" : process.env.NODE_ENV === "production";
+}
+
+/**
  * Hands the lead to its webhook. Returns false only when the lead is
  * genuinely unaccounted for — the caller then tells the visitor rather than
  * showing a confirmation for something that never arrived.
  */
-export async function deliverLead(
-  kind: LeadKind,
-  payload: Record<string, unknown>,
-): Promise<boolean> {
+export async function deliverLead(lead: Lead): Promise<boolean> {
+  const { kind } = lead;
   const envVar = WEBHOOK_ENV[kind];
   const webhookUrl = process.env[envVar];
+  const payload = toWebhookPayload(lead);
 
   if (webhookUrl) {
     if (await sendToCrm(webhookUrl, payload)) return true;
@@ -67,7 +119,7 @@ export async function deliverLead(
     return false;
   }
 
-  if (process.env.NODE_ENV === "production") {
+  if (isLiveSite()) {
     // Misconfigured production: every lead would vanish into the logs.
     console.error(
       `[${kind}] ${envVar} is not set — lead NOT delivered, visitor sent to ${CONTACT_EMAIL}; lead:`,
@@ -76,8 +128,8 @@ export async function deliverLead(
     return false;
   }
 
-  // Local/preview without a webhook: keep the lead readable and let the
-  // happy path work end to end.
-  console.warn(`[${kind}] ${envVar} not set (non-production); lead:`, JSON.stringify(payload));
+  // Local dev and Vercel previews without a webhook: keep the lead readable
+  // and let the happy path work end to end, without emailing the owner.
+  console.warn(`[${kind}] ${envVar} not set (not the live site); lead:`, JSON.stringify(payload));
   return true;
 }
