@@ -34,7 +34,7 @@ const privacySections: LegalSection[] = [
   {
     heading: "What you give us",
     paragraphs: [
-      "This site asks for personal information in two places, both on the booking page: the booking form and the “Questions first?” contact form.",
+      "This site asks for personal information in two places, both on the Contact page: the booking form and the “Questions first?” contact form.",
       "The contact form collects your name, your email address, and your question. The booking form collects:",
     ],
     bullets: [
@@ -55,8 +55,9 @@ const privacySections: LegalSection[] = [
   {
     heading: "Where it goes",
     paragraphs: [
-      "Both forms send your details over an encrypted connection to Formspree (Formspree, Inc.), a form-handling service that emails each submission to the inbox used to manage appointments and questions. Formspree also keeps a copy of each submission for as long as the business's Formspree account is active. It runs on infrastructure in the United States, so your details are stored and processed outside Canada. Formspree's own privacy policy is at formspree.io/legal/privacy.",
-      "This site is hosted on Vercel, which processes requests and stores operational logs on our behalf. Your details may appear in those logs as part of normal operation. Apart from Formspree and Vercel, no other party receives them.",
+      "Both forms send your details over an encrypted connection to Formspree (Formspree, Inc.), a form-handling service that emails each submission to the inbox used to manage appointments and questions. Formspree also keeps a copy of each submission for as long as the business's Formspree account is active. It runs on infrastructure in the United States, so your details are stored and processed outside Canada. Formspree's own privacy policy is at formspree.io/legal/privacy-policy.",
+      "This site is hosted on Vercel, which processes requests and stores operational logs on our behalf. Your details may appear in those logs as part of normal operation. Each notification email also passes through the email forwarding and mailbox services the business uses to receive it.",
+      "These service providers handle your details on the business's behalf, and some rely on providers of their own, as their privacy policies explain. Beyond them, the business does not share your details with anyone.",
     ],
   },
   {
@@ -86,7 +87,7 @@ const privacySections: LegalSection[] = [
   {
     heading: "Security",
     paragraphs: [
-      "The site is served over HTTPS and booking submissions are encrypted in transit. No system is perfectly secure, so please do not send payment card numbers or government ID through either form — they are never needed to book a detail.",
+      "The site is served over HTTPS and form submissions are encrypted in transit. No system is perfectly secure, so please do not send payment card numbers or government ID through either form — they are never needed to book a detail.",
     ],
   },
   {

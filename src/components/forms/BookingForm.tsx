@@ -111,7 +111,14 @@ export function BookingForm() {
           <label htmlFor="bf-service" className={labelBase}>
             Service <span className="text-danger" aria-hidden="true">*</span>
           </label>
+          {/*
+            React resets the form after each submit, and a <select> only takes
+            its defaultValue when it mounts. Keying on the submitted value
+            remounts it with the visitor's choice, so an error elsewhere
+            doesn't drop it back to the placeholder.
+          */}
           <select
+            key={values?.service ?? ""}
             id="bf-service"
             name="service"
             required
@@ -137,7 +144,9 @@ export function BookingForm() {
           <label htmlFor="bf-size" className={labelBase}>
             Vehicle size <span className="text-danger" aria-hidden="true">*</span>
           </label>
+          {/* Keyed for the same reason as the service select. */}
           <select
+            key={values?.vehicleSize ?? ""}
             id="bf-size"
             name="vehicleSize"
             required

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { deliverLead, timingSpamReason, type Lead } from "@/lib/leads";
+import { deliverLead, submissionTiming, UNVERIFIED_NOTE, type Lead } from "@/lib/leads";
 import { SERVICE_LABELS, VEHICLE_SIZE_LABELS } from "@/types/content";
 
 const booking: Lead = {
@@ -79,6 +79,29 @@ describe("deliverLead", () => {
     });
   });
 
+  it("delivers an unverified lead flagged, not dropped", async () => {
+    vi.stubEnv("BOOKING_WEBHOOK_URL", "https://formspree.test/booking");
+
+    expect(await deliverLead(booking, { unverified: true })).toBe(true);
+    const { body } = sent();
+    expect(body.subject).toBe("[No timing check] Booking request — Alex Rossi");
+    expect(body.timingCheck).toBe(UNVERIFIED_NOTE);
+    expect(Object.keys(body).slice(0, 2)).toEqual(["subject", "timingCheck"]);
+  });
+
+  it("leaves a verified lead unflagged", async () => {
+    vi.stubEnv("CONTACT_WEBHOOK_URL", "https://formspree.test/contact");
+
+    await deliverLead(question);
+    const { body } = sent();
+    expect(body.subject).toBe("Question — Alex Rossi");
+    expect(body).not.toHaveProperty("timingCheck");
+  });
+
+  it("keeps the flag's wording clear of spam-filter trigger words", () => {
+    expect(UNVERIFIED_NOTE).not.toMatch(/spam|bot/i);
+  });
+
   it("reports a rejected submission as undelivered, without retrying", async () => {
     vi.stubEnv("CONTACT_WEBHOOK_URL", "https://formspree.test/contact");
     fetchMock.mockResolvedValue(new Response('{"error":"Form not found"}', { status: 404 }));
@@ -108,21 +131,37 @@ describe("deliverLead", () => {
   });
 });
 
-describe("timingSpamReason", () => {
+describe("submissionTiming", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it.each([
-    [null, "no-timestamp"],
-    ["", "no-timestamp"],
-    ["abc", "bad-timestamp"],
-    ["0", "bad-timestamp"],
-  ])("flags the stamp %j as %s", (stamp, reason) => {
-    expect(timingSpamReason(stamp)).toBe(reason);
+    ["missing (JavaScript off, or sent before the scripts loaded)", null],
+    ["empty", ""],
+    ["not a number", "abc"],
+    ["negative", "-5"],
+  ])("treats a time on page that is %s as unverified", (_, value) => {
+    expect(submissionTiming(value)).toBe("unverified");
   });
 
-  it("flags a submit faster than a person could fill the form", () => {
-    expect(timingSpamReason(String(Date.now() - 1000))).toBe("too-fast");
+  it.each([["0"], ["2999"]])("flags %s ms on the page as too fast for a person", (value) => {
+    expect(submissionTiming(value)).toBe("too-fast");
   });
 
-  it("passes a human-paced submit", () => {
-    expect(timingSpamReason(String(Date.now() - 5000))).toBeNull();
+  it.each([["3000"], ["62000"]])("passes %s ms on the page", (value) => {
+    expect(submissionTiming(value)).toBe("human");
+  });
+
+  it("never consults the server's clock, so a visitor's clock skew can't matter", () => {
+    // The old check subtracted the visitor's clock from the server's, so a
+    // clock 60 s ahead turned a 62 s fill into a 2 s one and dropped the
+    // lead. The duration is now the page's own, whatever time it is here.
+    vi.useFakeTimers();
+    for (const now of ["2000-01-01", "2099-12-31"]) {
+      vi.setSystemTime(new Date(now));
+      expect(submissionTiming("62000")).toBe("human");
+      expect(submissionTiming("1000")).toBe("too-fast");
+    }
   });
 });
