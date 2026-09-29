@@ -2,7 +2,7 @@
 
 ## Launch readiness
 
-- Confirm real service pricing, contact details, business figures, legal content, and the production webhook.
+- Confirm real service pricing, business figures, and legal content, and decide whether to publish a phone number.
 - Replace all temporary stock photos with legitimate Riflessi photography.
 
 ## Engineering protection

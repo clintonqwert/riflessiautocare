@@ -29,7 +29,8 @@ export const SERVICE_CITIES = [
   "Vancouver",
 ] as const;
 
-// TODO(owner): confirm public contact email + phone before launch.
+// Live and receiving since 2026-09-28 (Porkbun forwarding).
+// TODO(owner): decide whether to publish a phone number, and add it here if so.
 export const CONTACT_EMAIL = "hello@riflessiautocare.ca";
 
 /** Booking response promise — quoted on /thank-you and the booking form. */

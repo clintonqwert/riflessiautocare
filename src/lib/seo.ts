@@ -9,7 +9,8 @@ import {
 import { VEHICLE_SIZE_LABELS, VEHICLE_SIZES } from "@/types/content";
 
 export const SITE_NAME = BUSINESS_NAME;
-// TODO(owner): confirm final production domain.
+// The production domain (live 2026-09-28). It is the one canonical address:
+// www redirects here with a 308, so canonical URLs must never use www.
 const _siteUrlFallback = "https://riflessiautocare.ca";
 if (!process.env.NEXT_PUBLIC_SITE_URL && process.env.NODE_ENV === "production") {
   throw new Error(
