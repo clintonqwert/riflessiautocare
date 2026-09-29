@@ -9,7 +9,9 @@ import {
 import { VEHICLE_SIZE_LABELS, VEHICLE_SIZES } from "@/types/content";
 
 export const SITE_NAME = BUSINESS_NAME;
-// TODO(owner): confirm final production domain.
+// The production domain and the one canonical address: canonical URLs must
+// never use www. Vercel must redirect www here with a 308, never the other
+// way (ai-context/07-deployment.md).
 const _siteUrlFallback = "https://riflessiautocare.ca";
 if (!process.env.NEXT_PUBLIC_SITE_URL && process.env.NODE_ENV === "production") {
   throw new Error(

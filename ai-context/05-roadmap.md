@@ -2,7 +2,7 @@
 
 ## Launch gate
 
-1. Confirm real pricing, contact details, stats, legal copy, and production booking webhook configuration.
+1. Confirm real pricing, stats, and legal copy, and decide whether to publish a phone number. Send one real submission per form from the live site and confirm both reach the inbox. Done 2026-09-28: the production domain is live, and mail to the contact email arrives.
 2. Replace temporary stock imagery with the business's own photography before presenting the gallery as proof of work.
 
 ## Already in place

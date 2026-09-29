@@ -32,7 +32,6 @@ jobs:
       # Only the build evaluates src/lib/seo.ts, which throws in production
       # builds without this var. The value here just has to be a valid origin
       # for metadata output — keep it in sync with _siteUrlFallback there.
-      # TODO(owner): update when the production domain is confirmed.
       - name: Build
         run: npm run build
         env:
