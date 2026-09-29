@@ -24,7 +24,8 @@ Riflessi Auto Care is live at https://riflessiautocare.ca (`www` redirects to it
 **Known gaps (not blocking launch)**
 
 - The legal pages are plain-language drafts awaiting a lawyer's review, with `TODO(owner)` gaps.
-- Some imagery is still temporary stock, credited where shown.
+- Imagery isn't settled. `/about` still shows stock frames of another bay and craftsman beside copy about this bay. The owner hasn't ruled on whether the showcase photos ("Il Portfolio" on the home page and `/gallery`) fit the outdoor-bay copy. `docs/maintenance/IMAGE-CREDITS.md` still lists all 12 credited images as stock, though some are now the owner's own.
+- One real submission from each form on the live site has to be confirmed in the inbox before the `v1.0.0` tag is cut.
 - No Content-Security-Policy, Lighthouse CI gate, or failed-booking alert yet (see the roadmap).
 - `/locations/[slug]` pages for the five cities are still to come.
 

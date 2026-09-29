@@ -4,9 +4,16 @@
 
 **Decision:** Tag the live site as 1.0.0. The owner confirmed every price in `src/lib/content/pricing.ts` and the "6h+" Signature Full Detail figure in `stats.ts` as real, so they are no longer placeholders.
 
-**Reason:** The site is public on its own domain, and forms deliver to the business inbox. With prices and figures signed off, nothing on the site is invented anymore, and a tag gives the launch a fixed point to compare against or roll back to.
+**Reason:** The site is public on its own domain, and both forms are wired to deliver to the business inbox through Formspree. The prices and the hours figure are no longer placeholders. A tag gives the launch a fixed point to compare against or roll back to, so it is cut only after one real submission from each form on the live site has reached the inbox (not Formspree's spam tab).
 
-**Consequence:** Prices and stats change only with the owner's sign-off. Still open after launch, and not blocking it: a lawyer's review of the legal pages and their `TODO(owner)` gaps, the owner's own photography in place of stock, a confirmed real submission from each form, and whether to publish a phone number.
+**Consequence:** Prices and stats change only with the owner's sign-off. The sign-off does not cover imagery, and these stay open after launch:
+
+- `/about` still shows stock bay and craftsman frames beside copy about the bay (`docs/maintenance/IMAGE-CREDITS.md`: "not this bay or this owner").
+- The owner hasn't ruled on the showcase photos presented as "Il Portfolio" on the home page and `/gallery`. Their multi-bay shop setting may contradict the outdoor-bay copy.
+- `IMAGE-CREDITS.md` still calls all 12 credited images stock, though some are now the owner's own.
+- A lawyer's review of the legal pages and their `TODO(owner)` gaps, and whether to publish a phone number.
+
+Until those are settled, no role should present the gallery or `/about` imagery as proof of this bay's work.
 
 ## 2026-09-28 — riflessiautocare.ca (no www) is the canonical address
 
