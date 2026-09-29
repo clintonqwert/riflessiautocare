@@ -3,12 +3,8 @@ import "server-only";
 import type { ZodError } from "zod";
 import { sendToCrm } from "@/lib/crm";
 import { CONTACT_EMAIL } from "@/lib/content/site";
-import {
-  SERVICE_LABELS,
-  VEHICLE_SIZE_LABELS,
-  type ServiceSlug,
-  type VehicleSize,
-} from "@/types/content";
+import type { BookingFields, ContactFields } from "@/lib/form-schemas";
+import { SERVICE_LABELS, VEHICLE_SIZE_LABELS } from "@/types/content";
 
 /**
  * Spam gate and delivery shared by the form Server Actions (booking and
@@ -24,38 +20,34 @@ const WEBHOOK_ENV = {
 } as const;
 
 /** A validated submission, as each form's Server Action hands it over. */
-export type Lead =
-  | {
-      kind: "booking";
-      name: string;
-      email: string;
-      phone: string;
-      vehicle: string;
-      service: ServiceSlug;
-      vehicleSize: VehicleSize;
-      preferredDate: string;
-      notes?: string;
-    }
-  | { kind: "contact"; name: string; email: string; message: string };
+export type Lead = ({ kind: "booking" } & BookingFields) | ({ kind: "contact" } & ContactFields);
 
 /** Minimum ms between form render and submit — bots fill instantly. */
 const MIN_TIME_TO_SUBMIT_MS = 3000;
 
 /**
- * Timing check on the hidden `startedAt` stamp.
+ * What the hidden `startedAt` stamp says about a submission.
  *
- * A missing or zero stamp is spam, not a real visitor: the stamp is written
- * on hydration, and these forms only submit through the hydrated action, so a
- * genuine submission always carries one. (`Number("")` is 0 and slips past a
- * bare finite check — that was the bug.) If a form is ever made to work
- * without JS, revisit: an empty stamp would then be a real lead.
+ * - `human`: filled at a person's pace.
+ * - `too-fast`: submitted under 3 s after the form appeared. A bot; discard.
+ * - `unverified`: no usable stamp, so timing can't tell. The stamp is written
+ *   by the page's JavaScript, but both forms also submit as plain HTML posts,
+ *   so this is what arrives from a visitor with JavaScript off, or one who
+ *   submits before the page's scripts finish loading. It is also what a
+ *   visitor's clock running ahead of the server's produces. It could be a
+ *   bot, so the lead is delivered flagged, never discarded: a real lead
+ *   thrown away with a "thanks" is the one failure this pipeline refuses.
  */
-export function timingSpamReason(raw: FormDataEntryValue | null): string | null {
-  if (typeof raw !== "string" || raw.trim() === "") return "no-timestamp";
+export type SubmissionTiming = "human" | "too-fast" | "unverified";
+
+export function submissionTiming(raw: FormDataEntryValue | null): SubmissionTiming {
+  if (typeof raw !== "string" || raw.trim() === "") return "unverified";
   const startedAt = Number(raw);
-  if (!Number.isFinite(startedAt) || startedAt <= 0) return "bad-timestamp";
-  if (Date.now() - startedAt < MIN_TIME_TO_SUBMIT_MS) return "too-fast";
-  return null;
+  // `Number("")` is 0 and slips past a bare finite check, hence `<= 0`.
+  if (!Number.isFinite(startedAt) || startedAt <= 0) return "unverified";
+  const elapsed = Date.now() - startedAt;
+  if (elapsed < 0) return "unverified"; // the visitor's clock is ahead of ours
+  return elapsed < MIN_TIME_TO_SUBMIT_MS ? "too-fast" : "human";
 }
 
 /** The first message per field — what the forms show under each input. */
@@ -67,26 +59,36 @@ export function fieldErrors(error: ZodError): Record<string, string> {
   return errors;
 }
 
+/** Heads an unverified lead's email, so the owner knows why it is flagged. */
+export const UNVERIFIED_NOTE =
+  "The page's spam timer didn't run: sent with JavaScript off, or before the page finished loading. Likely a real visitor if the details make sense, but it could be a bot.";
+
 /**
  * Shapes a lead for Formspree, which emails it to the business inbox:
  * `subject` becomes the email's subject line and `email` its Reply-To, so the
  * owner can answer straight from the inbox. Booking emails show the service
- * and size labels the visitor picked, not slugs.
+ * and size labels the visitor picked, not slugs. An unverified lead says so
+ * in its subject line and first field.
  */
-function toWebhookPayload(lead: Lead): Record<string, unknown> {
+function toWebhookPayload(lead: Lead, unverified: boolean): Record<string, unknown> {
   const { kind, ...fields } = lead;
+  const title = lead.kind === "booking" ? "Booking request" : "Question";
+  const head = {
+    subject: `${unverified ? "[Unverified] " : ""}${title} — ${lead.name}`,
+    ...(unverified && { spamCheck: UNVERIFIED_NOTE }),
+  };
   const stamp = { source: `${kind}-form`, submittedAt: new Date().toISOString() };
 
   if (lead.kind === "booking") {
     return {
-      subject: `Booking request — ${lead.name}`,
+      ...head,
       ...fields,
       service: SERVICE_LABELS[lead.service],
       vehicleSize: VEHICLE_SIZE_LABELS[lead.vehicleSize],
       ...stamp,
     };
   }
-  return { subject: `Question — ${lead.name}`, ...fields, ...stamp };
+  return { ...head, ...fields, ...stamp };
 }
 
 /**
@@ -104,11 +106,14 @@ function isLiveSite(): boolean {
  * genuinely unaccounted for — the caller then tells the visitor rather than
  * showing a confirmation for something that never arrived.
  */
-export async function deliverLead(lead: Lead): Promise<boolean> {
+export async function deliverLead(
+  lead: Lead,
+  { unverified = false }: { unverified?: boolean } = {},
+): Promise<boolean> {
   const { kind } = lead;
   const envVar = WEBHOOK_ENV[kind];
   const webhookUrl = process.env[envVar];
-  const payload = toWebhookPayload(lead);
+  const payload = toWebhookPayload(lead, unverified);
 
   if (webhookUrl) {
     if (await sendToCrm(webhookUrl, payload)) return true;

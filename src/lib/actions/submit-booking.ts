@@ -1,16 +1,9 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { z } from "zod";
-import { deliverLead, fieldErrors, timingSpamReason } from "@/lib/leads";
-import {
-  FREE_TEXT_MAX_LABEL,
-  FREE_TEXT_MAX_LENGTH,
-  SERVICE_OPTIONS,
-  VEHICLE_SIZES,
-  type BookingFormValues,
-  type FormResult,
-} from "@/types/forms";
+import { bookingSchema } from "@/lib/form-schemas";
+import { deliverLead, fieldErrors, submissionTiming } from "@/lib/leads";
+import type { BookingFormValues, FormResult } from "@/types/forms";
 
 /**
  * Shown when the lead could not be handed off. The form pairs this with a
@@ -19,27 +12,6 @@ import {
  */
 const DELIVERY_FAILED_MESSAGE =
   "Your request could not be sent — it did not reach the booking inbox, so nothing has been booked yet.";
-
-const bookingSchema = z.object({
-  name: z.string().trim().min(2, "Please enter your name."),
-  email: z.email("Please enter a valid email address."),
-  phone: z
-    .string()
-    .trim()
-    .min(7, "Please enter a phone number so your slot can be confirmed."),
-  vehicle: z
-    .string()
-    .trim()
-    .min(3, "Tell me the year, make, and model — e.g. 2021 Mazda CX-5."),
-  service: z.enum(SERVICE_OPTIONS, { error: "Please choose a service." }),
-  vehicleSize: z.enum(VEHICLE_SIZES, { error: "Please choose a vehicle size." }),
-  preferredDate: z.string().trim().min(1, "Pick a preferred drop-off day."),
-  notes: z
-    .string()
-    .trim()
-    .max(FREE_TEXT_MAX_LENGTH, `Please keep your notes to ${FREE_TEXT_MAX_LABEL} characters or fewer.`)
-    .optional(),
-});
 
 type BookingResult = FormResult<BookingFormValues>;
 
@@ -53,7 +25,7 @@ export async function submitBooking(
     redirect("/thank-you");
   }
 
-  const spamReason = timingSpamReason(formData.get("startedAt"));
+  const timing = submissionTiming(formData.get("startedAt"));
 
   // Capture safe-to-echo values before validation (excludes honeypot/startedAt).
   const submittedValues: BookingFormValues = {
@@ -76,17 +48,17 @@ export async function submitBooking(
     return { ok: false, errors: fieldErrors(parsed.error), values: submittedValues };
   }
 
-  if (spamReason) {
+  if (timing === "too-fast") {
     // Success path, no delivery — detection is never revealed. Logged rather
     // than dropped in silence, so a false positive is at least diagnosable.
-    console.warn(
-      `[booking] discarded as spam (${spamReason}); submission:`,
-      JSON.stringify(submittedValues),
-    );
+    console.warn("[booking] discarded as spam (too-fast); submission:", JSON.stringify(submittedValues));
     redirect("/thank-you");
   }
 
-  const delivered = await deliverLead({ kind: "booking", ...parsed.data });
+  const delivered = await deliverLead(
+    { kind: "booking", ...parsed.data },
+    { unverified: timing === "unverified" },
+  );
 
   if (!delivered) {
     return {

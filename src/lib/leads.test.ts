@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { deliverLead, timingSpamReason, type Lead } from "@/lib/leads";
+import { deliverLead, submissionTiming, UNVERIFIED_NOTE, type Lead } from "@/lib/leads";
 import { SERVICE_LABELS, VEHICLE_SIZE_LABELS } from "@/types/content";
 
 const booking: Lead = {
@@ -79,6 +79,25 @@ describe("deliverLead", () => {
     });
   });
 
+  it("delivers an unverified lead flagged, not dropped", async () => {
+    vi.stubEnv("BOOKING_WEBHOOK_URL", "https://formspree.test/booking");
+
+    expect(await deliverLead(booking, { unverified: true })).toBe(true);
+    const { body } = sent();
+    expect(body.subject).toBe("[Unverified] Booking request — Alex Rossi");
+    expect(body.spamCheck).toBe(UNVERIFIED_NOTE);
+    expect(Object.keys(body).slice(0, 2)).toEqual(["subject", "spamCheck"]);
+  });
+
+  it("leaves a verified lead unflagged", async () => {
+    vi.stubEnv("CONTACT_WEBHOOK_URL", "https://formspree.test/contact");
+
+    await deliverLead(question);
+    const { body } = sent();
+    expect(body.subject).toBe("Question — Alex Rossi");
+    expect(body).not.toHaveProperty("spamCheck");
+  });
+
   it("reports a rejected submission as undelivered, without retrying", async () => {
     vi.stubEnv("CONTACT_WEBHOOK_URL", "https://formspree.test/contact");
     fetchMock.mockResolvedValue(new Response('{"error":"Form not found"}', { status: 404 }));
@@ -108,21 +127,22 @@ describe("deliverLead", () => {
   });
 });
 
-describe("timingSpamReason", () => {
+describe("submissionTiming", () => {
   it.each([
-    [null, "no-timestamp"],
-    ["", "no-timestamp"],
-    ["abc", "bad-timestamp"],
-    ["0", "bad-timestamp"],
-  ])("flags the stamp %j as %s", (stamp, reason) => {
-    expect(timingSpamReason(stamp)).toBe(reason);
+    ["missing (JavaScript off, or sent before the page loaded)", null],
+    ["empty", ""],
+    ["not a number", "abc"],
+    ["zero", "0"],
+    ["from a clock running ahead of the server's", String(Date.now() + 60_000)],
+  ])("treats a stamp that is %s as unverified", (_, stamp) => {
+    expect(submissionTiming(stamp)).toBe("unverified");
   });
 
   it("flags a submit faster than a person could fill the form", () => {
-    expect(timingSpamReason(String(Date.now() - 1000))).toBe("too-fast");
+    expect(submissionTiming(String(Date.now() - 1000))).toBe("too-fast");
   });
 
   it("passes a human-paced submit", () => {
-    expect(timingSpamReason(String(Date.now() - 5000))).toBeNull();
+    expect(submissionTiming(String(Date.now() - 5000))).toBe("human");
   });
 });

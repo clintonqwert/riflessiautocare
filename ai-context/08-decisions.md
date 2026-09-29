@@ -13,6 +13,7 @@ Owner choices made with it (2026-09-28):
 - **Spam filter:** Formspree can flag a real lead as spam. The visitor then sees a success message and no email is sent, and the API can't tell us. The owner checks the Formspree spam tab weekly until there is a track record, rather than paying for the plan that allows "Relaxed" filtering.
 - **Free-text limit:** the contact message and booking notes are capped at 2,000 characters.
 - **Previews:** without the webhook variables, Vercel previews log the lead and show success, like local dev. Only the live site (`VERCEL_ENV=production`) fails loud.
+- **Missing spam timer** (added after the post-merge review): a submission with no usable timer stamp is delivered with an `[Unverified]` subject and a note, never discarded. That covers JavaScript off, a submit before the page's scripts load, and a visitor clock running ahead of the server's. Only the honeypot and a real stamp under 3 s are discarded. The cost is the occasional flagged bot.
 
 ## 2026-09-28 — Vitest for unit tests; CI gates lint, typecheck, test, and build
 

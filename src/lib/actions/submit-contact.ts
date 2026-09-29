@@ -1,13 +1,8 @@
 "use server";
 
-import { z } from "zod";
-import { deliverLead, fieldErrors, timingSpamReason } from "@/lib/leads";
-import {
-  FREE_TEXT_MAX_LABEL,
-  FREE_TEXT_MAX_LENGTH,
-  type ContactFormValues,
-  type FormResult,
-} from "@/types/forms";
+import { contactSchema } from "@/lib/form-schemas";
+import { deliverLead, fieldErrors, submissionTiming } from "@/lib/leads";
+import type { ContactFormValues, FormResult } from "@/types/forms";
 
 /**
  * Shown when the message could not be handed off. The form pairs this with a
@@ -16,16 +11,6 @@ import {
  */
 const DELIVERY_FAILED_MESSAGE =
   "Your message could not be sent — it did not reach the inbox.";
-
-const contactSchema = z.object({
-  name: z.string().trim().min(2, "Please enter your name."),
-  email: z.email("Please enter a valid email address."),
-  message: z
-    .string()
-    .trim()
-    .min(10, "Tell me a little more — a sentence or two is plenty.")
-    .max(FREE_TEXT_MAX_LENGTH, `Please keep your question to ${FREE_TEXT_MAX_LABEL} characters or fewer.`),
-});
 
 type ContactResult = FormResult<ContactFormValues>;
 
@@ -37,7 +22,7 @@ export async function submitContact(
   // never revealed, and deliver nothing.
   if (formData.get("website")) return { ok: true };
 
-  const spamReason = timingSpamReason(formData.get("startedAt"));
+  const timing = submissionTiming(formData.get("startedAt"));
 
   const submittedValues: ContactFormValues = {
     name: String(formData.get("name") ?? ""),
@@ -50,16 +35,16 @@ export async function submitContact(
     return { ok: false, errors: fieldErrors(parsed.error), values: submittedValues };
   }
 
-  if (spamReason) {
+  if (timing === "too-fast") {
     // Success path, no delivery — see submit-booking.ts.
-    console.warn(
-      `[contact] discarded as spam (${spamReason}); submission:`,
-      JSON.stringify(submittedValues),
-    );
+    console.warn("[contact] discarded as spam (too-fast); submission:", JSON.stringify(submittedValues));
     return { ok: true };
   }
 
-  const delivered = await deliverLead({ kind: "contact", ...parsed.data });
+  const delivered = await deliverLead(
+    { kind: "contact", ...parsed.data },
+    { unverified: timing === "unverified" },
+  );
 
   if (!delivered) {
     return { ok: false, errors: { form: DELIVERY_FAILED_MESSAGE }, values: submittedValues };
