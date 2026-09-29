@@ -3,7 +3,7 @@
  *
  * TODO(owner): these are plain-language drafts describing how the site
  * actually behaves — they are NOT legal advice and have not been reviewed by
- * a lawyer. The site is live (2026-09-28), so have them reviewed now, and
+ * a lawyer. Have them reviewed as soon as possible, and
  * fill the TODO(owner) gaps flagged inline (retention period, cancellation
  * policy, insurance wording, registered business name).
  *

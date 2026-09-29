@@ -2,7 +2,7 @@
 
 ## Launch readiness
 
-- Confirm real service pricing, business figures, and legal content, and decide whether to publish a phone number.
+- Confirm real service pricing, business figures, and legal content, and decide whether to publish a phone number. Confirm one real submission from each form on the live site reaches the inbox.
 - Replace all temporary stock photos with legitimate Riflessi photography.
 
 ## Engineering protection

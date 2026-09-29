@@ -8,6 +8,8 @@
 
 **Consequence:** `NEXT_PUBLIC_SITE_URL` in Vercel production and the fallback in `src/lib/seo.ts` stay `https://riflessiautocare.ca`. Any domain change updates the Vercel redirect and that variable together.
 
+**Status:** when this was decided, Vercel still redirected the bare domain to `www`, the opposite of the decision. Flipping it in Vercel → Domains is an owner action; `ai-context/07-deployment.md` has the check.
+
 ## 2026-09-28 — Formspree delivers booking and contact leads
 
 **Decision:** Deliver both forms through the owner's Formspree form endpoints, one per form, set as `BOOKING_WEBHOOK_URL` and `CONTACT_WEBHOOK_URL`. The Server Actions post to them server-side. Add a "Questions first?" contact form below the booking form on `/contact`.

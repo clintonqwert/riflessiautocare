@@ -29,7 +29,7 @@ export const SERVICE_CITIES = [
   "Vancouver",
 ] as const;
 
-// Live and receiving since 2026-09-28 (Porkbun forwarding).
+// Receives mail through the domain's Porkbun email forwarding (its MX records).
 // TODO(owner): decide whether to publish a phone number, and add it here if so.
 export const CONTACT_EMAIL = "hello@riflessiautocare.ca";
 
