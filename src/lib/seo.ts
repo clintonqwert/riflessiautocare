@@ -85,6 +85,8 @@ export function localBusinessSchema() {
     "@type": "AutoRepair",
     name: SITE_NAME,
     url: SITE_URL,
+    // Built by scripts/build-brand-icons.mjs. Google wants a raster logo here.
+    logo: `${SITE_URL}/brand/riflessi-logo-512.png`,
     description: SITE_DESCRIPTION,
     email: CONTACT_EMAIL,
     areaServed: SERVICE_CITIES.map((city) => ({

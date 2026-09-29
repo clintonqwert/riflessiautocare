@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { buttonClasses } from "@/components/ui/button";
+import { Wordmark } from "@/components/ui/Wordmark";
 import {
   SERVICES_COLUMN,
   EXPLORE_COLUMN,
@@ -48,9 +49,7 @@ export function SiteFooter() {
           {/* Col 1 — Brand */}
           <div className="md:col-span-1">
             <Link href="/" aria-label="Riflessi Auto Care home">
-              <span className="font-serif text-xl font-medium tracking-tight text-fg">
-                Riflessi
-              </span>
+              <Wordmark />
             </Link>
             <p className="mt-3 text-sm leading-relaxed text-muted">
               {BAY_FACTS.model} serving {BAY_FACTS.areaServed}.

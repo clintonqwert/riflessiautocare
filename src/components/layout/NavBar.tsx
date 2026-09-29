@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { PRIMARY_NAV, PRIMARY_CTA } from "@/lib/content/navigation";
 import { buttonClasses } from "@/components/ui/button";
+import { Wordmark } from "@/components/ui/Wordmark";
 
 function subscribeToScroll(cb: () => void) {
   window.addEventListener("scroll", cb, { passive: true });
@@ -11,17 +12,6 @@ function subscribeToScroll(cb: () => void) {
 }
 const getScrollSnapshot = () => window.scrollY > 60;
 const getServerScrollSnapshot = () => false;
-
-function Wordmark() {
-  return (
-    <span className="font-serif text-xl font-medium tracking-tight text-fg">
-      Riflessi
-      <span className="ml-2 align-middle text-[11px] font-sans font-semibold uppercase tracking-[0.18em] text-accent">
-        Auto Care
-      </span>
-    </span>
-  );
-}
 
 export function NavBar() {
   const isScrolled = useSyncExternalStore(
