@@ -29,7 +29,7 @@
     "zod": "^4.4.3"
   },
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=20.9.0"
   },
   "devDependencies": {
     "@gltf-transform/core": "^4.4.2",
@@ -43,6 +43,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.6",
     "meshoptimizer": "^1.2.0",
+    "sharp": "^0.35.5",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^5.0.2"
