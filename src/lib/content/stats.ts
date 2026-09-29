@@ -3,8 +3,8 @@ import type { Stat } from "@/types/content";
 /**
  * Stats band figures. Only structurally-true facts of the service model —
  * no invented volume or review counts.
- * TODO(owner): confirm the hours figure; swap in real counts (vehicles
- * detailed, years) once you want them published.
+ * The hours figure is owner-confirmed (ai-context/08-decisions.md). Add real
+ * counts (vehicles detailed, years) only once the owner wants them published.
  */
 const stats: Stat[] = [
   { value: 1, label: "Vehicle in the bay at a time" },

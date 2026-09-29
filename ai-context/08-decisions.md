@@ -1,5 +1,13 @@
 # Riflessi decision log
 
+## 2026-09-29 — Release 1.0.0: launch content confirmed
+
+**Decision:** Tag the live site as 1.0.0. The owner confirmed every price in `src/lib/content/pricing.ts` and the "6h+" Signature Full Detail figure in `stats.ts` as real, so they are no longer placeholders.
+
+**Reason:** The site is public on its own domain, and forms deliver to the business inbox. With prices and figures signed off, nothing on the site is invented anymore, and a tag gives the launch a fixed point to compare against or roll back to.
+
+**Consequence:** Prices and stats change only with the owner's sign-off. Still open after launch, and not blocking it: a lawyer's review of the legal pages and their `TODO(owner)` gaps, the owner's own photography in place of stock, a confirmed real submission from each form, and whether to publish a phone number.
+
 ## 2026-09-28 — riflessiautocare.ca (no www) is the canonical address
 
 **Decision:** Serve the site at `https://riflessiautocare.ca`. `www.riflessiautocare.ca` redirects to it with a permanent 308.
@@ -8,7 +16,7 @@
 
 **Consequence:** `NEXT_PUBLIC_SITE_URL` in Vercel production and the fallback in `src/lib/seo.ts` stay `https://riflessiautocare.ca`. Any domain change updates the Vercel redirect and that variable together.
 
-**Status:** when this was decided, Vercel still redirected the bare domain to `www`, the opposite of the decision. Flipping it in Vercel → Domains is an owner action; `ai-context/07-deployment.md` has the check.
+**Status:** when this was decided, Vercel still redirected the bare domain to `www`. The owner flipped it on 2026-09-29; `www` now returns 308 to the bare domain, and the check in `ai-context/07-deployment.md` passes.
 
 ## 2026-09-28 — Formspree delivers booking and contact leads
 

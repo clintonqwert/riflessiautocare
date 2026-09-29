@@ -1,7 +1,7 @@
 import type { AddOn, PricingPackage, ServiceSlug } from "@/types/content";
 
-// TODO(owner): every dollar figure below is a placeholder pending owner
-// sign-off (no-invention rule). Confirm before launch.
+// Owner-confirmed prices (ai-context/08-decisions.md). No-invention rule:
+// change a figure only with the owner's sign-off.
 
 const packages: PricingPackage[] = [
   {
