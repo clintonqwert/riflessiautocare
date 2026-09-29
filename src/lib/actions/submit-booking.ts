@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { bookingSchema } from "@/lib/form-schemas";
 import { deliverLead, fieldErrors, submissionTiming } from "@/lib/leads";
-import type { BookingFormValues, FormResult } from "@/types/forms";
+import { TIME_ON_PAGE_FIELD, type BookingFormValues, type FormResult } from "@/types/forms";
 
 /**
  * Shown when the lead could not be handed off. The form pairs this with a
@@ -25,9 +25,9 @@ export async function submitBooking(
     redirect("/thank-you");
   }
 
-  const timing = submissionTiming(formData.get("startedAt"));
+  const timing = submissionTiming(formData.get(TIME_ON_PAGE_FIELD));
 
-  // Capture safe-to-echo values before validation (excludes honeypot/startedAt).
+  // Capture safe-to-echo values before validation (excludes the spam-check fields).
   const submittedValues: BookingFormValues = {
     name: String(formData.get("name") ?? ""),
     email: String(formData.get("email") ?? ""),

@@ -13,7 +13,8 @@ Owner choices made with it (2026-09-28):
 - **Spam filter:** Formspree can flag a real lead as spam. The visitor then sees a success message and no email is sent, and the API can't tell us. The owner checks the Formspree spam tab weekly until there is a track record, rather than paying for the plan that allows "Relaxed" filtering.
 - **Free-text limit:** the contact message and booking notes are capped at 2,000 characters.
 - **Previews:** without the webhook variables, Vercel previews log the lead and show success, like local dev. Only the live site (`VERCEL_ENV=production`) fails loud.
-- **Missing spam timer** (added after the post-merge review): a submission with no usable timer stamp is delivered with an `[Unverified]` subject and a note, never discarded. That covers JavaScript off, a submit before the page's scripts load, and a visitor clock running ahead of the server's. Only the honeypot and a real stamp under 3 s are discarded. The cost is the occasional flagged bot.
+- **Timing check** (added after the post-merge review): the page reports how long it had been open when the form was sent, measured on its own clock from page load, so no two clocks are ever compared. A submission without that time (JavaScript off, or sent before the page's scripts load) is delivered with a `[No timing check]` subject and a neutral note, never discarded. Only the honeypot and a reported time under 3 s are discarded.
+- **Cost of that:** bots that skip JavaScript and the honeypot now reach Formspree and count against the monthly quota, which both forms share (50 on the free plan). Once it runs out, Formspree refuses posts and every lead falls back to the email link until the month resets. That is loud, not silent. The owner watches Formspree's 50/75/90% usage emails and how many `[No timing check]` emails arrive, and hardens the gate only if unchecked spam actually shows up.
 
 ## 2026-09-28 — Vitest for unit tests; CI gates lint, typecheck, test, and build
 

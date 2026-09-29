@@ -22,32 +22,31 @@ const WEBHOOK_ENV = {
 /** A validated submission, as each form's Server Action hands it over. */
 export type Lead = ({ kind: "booking" } & BookingFields) | ({ kind: "contact" } & ContactFields);
 
-/** Minimum ms between form render and submit — bots fill instantly. */
+/** Minimum time on the page before a real visitor could send a form — bots fill instantly. */
 const MIN_TIME_TO_SUBMIT_MS = 3000;
 
 /**
- * What the hidden `startedAt` stamp says about a submission.
+ * What the page's time-on-page field (TIME_ON_PAGE_FIELD) says about a
+ * submission. The page measures it on one clock of its own, so nothing here
+ * compares the visitor's clock with the server's.
  *
- * - `human`: filled at a person's pace.
- * - `too-fast`: submitted under 3 s after the form appeared. A bot; discard.
- * - `unverified`: no usable stamp, so timing can't tell. The stamp is written
- *   by the page's JavaScript, but both forms also submit as plain HTML posts,
- *   so this is what arrives from a visitor with JavaScript off, or one who
- *   submits before the page's scripts finish loading. It is also what a
- *   visitor's clock running ahead of the server's produces. It could be a
- *   bot, so the lead is delivered flagged, never discarded: a real lead
- *   thrown away with a "thanks" is the one failure this pipeline refuses.
+ * - `human`: sent at a person's pace.
+ * - `too-fast`: sent under 3 s after the page began loading. A bot; discard.
+ * - `unverified`: no usable time, so timing can't tell. The page's
+ *   JavaScript adds it, but both forms also submit as plain HTML posts, so
+ *   this is what arrives from a visitor with JavaScript off, or one who
+ *   sends before the page's scripts finish loading. It could be a bot, so
+ *   the lead is delivered flagged, never discarded: a real lead thrown away
+ *   behind a "thanks" is the one failure this pipeline refuses.
  */
 export type SubmissionTiming = "human" | "too-fast" | "unverified";
 
 export function submissionTiming(raw: FormDataEntryValue | null): SubmissionTiming {
+  // `Number("")` is 0, so an empty value must be caught before converting.
   if (typeof raw !== "string" || raw.trim() === "") return "unverified";
-  const startedAt = Number(raw);
-  // `Number("")` is 0 and slips past a bare finite check, hence `<= 0`.
-  if (!Number.isFinite(startedAt) || startedAt <= 0) return "unverified";
-  const elapsed = Date.now() - startedAt;
-  if (elapsed < 0) return "unverified"; // the visitor's clock is ahead of ours
-  return elapsed < MIN_TIME_TO_SUBMIT_MS ? "too-fast" : "human";
+  const timeOnPage = Number(raw);
+  if (!Number.isFinite(timeOnPage) || timeOnPage < 0) return "unverified";
+  return timeOnPage < MIN_TIME_TO_SUBMIT_MS ? "too-fast" : "human";
 }
 
 /** The first message per field — what the forms show under each input. */
@@ -59,9 +58,13 @@ export function fieldErrors(error: ZodError): Record<string, string> {
   return errors;
 }
 
-/** Heads an unverified lead's email, so the owner knows why it is flagged. */
+/**
+ * Heads an unverified lead's email, so the owner knows why it is flagged.
+ * Kept neutral on purpose: Formspree filters on "spammy phrases", and a note
+ * that talks about spam or bots could send a real lead to its spam tab.
+ */
 export const UNVERIFIED_NOTE =
-  "The page's spam timer didn't run: sent with JavaScript off, or before the page finished loading. Likely a real visitor if the details make sense, but it could be a bot.";
+  "The page's timing check didn't run: sent with JavaScript off, or before the page finished loading. Worth a quick look at the details before replying.";
 
 /**
  * Shapes a lead for Formspree, which emails it to the business inbox:
@@ -74,8 +77,8 @@ function toWebhookPayload(lead: Lead, unverified: boolean): Record<string, unkno
   const { kind, ...fields } = lead;
   const title = lead.kind === "booking" ? "Booking request" : "Question";
   const head = {
-    subject: `${unverified ? "[Unverified] " : ""}${title} — ${lead.name}`,
-    ...(unverified && { spamCheck: UNVERIFIED_NOTE }),
+    subject: `${unverified ? "[No timing check] " : ""}${title} — ${lead.name}`,
+    ...(unverified && { timingCheck: UNVERIFIED_NOTE }),
   };
   const stamp = { source: `${kind}-form`, submittedAt: new Date().toISOString() };
 

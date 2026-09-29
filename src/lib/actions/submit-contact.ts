@@ -2,7 +2,7 @@
 
 import { contactSchema } from "@/lib/form-schemas";
 import { deliverLead, fieldErrors, submissionTiming } from "@/lib/leads";
-import type { ContactFormValues, FormResult } from "@/types/forms";
+import { TIME_ON_PAGE_FIELD, type ContactFormValues, type FormResult } from "@/types/forms";
 
 /**
  * Shown when the message could not be handed off. The form pairs this with a
@@ -22,7 +22,7 @@ export async function submitContact(
   // never revealed, and deliver nothing.
   if (formData.get("website")) return { ok: true };
 
-  const timing = submissionTiming(formData.get("startedAt"));
+  const timing = submissionTiming(formData.get(TIME_ON_PAGE_FIELD));
 
   const submittedValues: ContactFormValues = {
     name: String(formData.get("name") ?? ""),

@@ -11,7 +11,13 @@ export const FREE_TEXT_MAX_LENGTH = 2000;
 /** The limit as visitors read it: "2,000". */
 export const FREE_TEXT_MAX_LABEL = FREE_TEXT_MAX_LENGTH.toLocaleString("en-CA");
 
-/** Safe-to-echo values returned alongside validation errors (excludes honeypot/startedAt). */
+/**
+ * How long the page had been open when its form was sent, in ms. Added by
+ * the page itself (forms/FormParts.tsx) and judged by src/lib/leads.ts.
+ */
+export const TIME_ON_PAGE_FIELD = "timeOnPageMs";
+
+/** Safe-to-echo values returned alongside validation errors (excludes the spam-check fields). */
 export interface BookingFormValues {
   name: string;
   email: string;
@@ -23,7 +29,7 @@ export interface BookingFormValues {
   notes: string;
 }
 
-/** Safe-to-echo values from the contact form (excludes honeypot/startedAt). */
+/** Safe-to-echo values from the contact form (excludes the spam-check fields). */
 export interface ContactFormValues {
   name: string;
   email: string;
