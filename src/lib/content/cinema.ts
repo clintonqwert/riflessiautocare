@@ -45,8 +45,8 @@ const acts: CinemaAct[] = [
     heading: "One vehicle. Undivided attention.",
     body: "Riflessi is a private, appointment-only detailing service. Drop off your car and it gets the bay to itself and one craftsman's full attention — until the finish is right.",
     pose: {
-      position: [-10.45, 4.85, 10.05],
-      target: [0.35, -1.6, 0.15],
+      position: [-11.75, 5.25, 13.65],
+      target: [1.75, -1.6, 0.15],
       exposure: 1.41,
       finish: 0.79,
     },
@@ -58,7 +58,7 @@ const acts: CinemaAct[] = [
     body: "Riflessi is Italian for reflections. When the work is done, paint should hand back a clean picture of whatever stands in front of it — no haze softening the edges, no swirls breaking up the light.",
     pose: {
       position: [12.15, 9.9, 18.95],
-      target: [-5.05, -1.95, 0.55],
+      target: [-5.05, -3, -1.95],
       exposure: 1.96,
       finish: 0.48,
     },
@@ -97,8 +97,8 @@ const acts: CinemaAct[] = [
     heading: "Four services. Each done completely.",
     body: "No fifteen-item menu and no upsell ladder — four ways to bring a car back, each one taken start to finish inside a single booking.",
     pose: {
-      position: [4.5, 7.5, 14.5],
-      target: [0, -0.6, 0],
+      position: [-3.1, 7.5, 15.55],
+      target: [0.1, -2.55, -0.9],
       exposure: 0.58,
       finish: 0.68,
     },
@@ -110,7 +110,7 @@ const acts: CinemaAct[] = [
     body: "Polishing restores the reflection; protection is what keeps it. A sealant carries a car through months of BC weather, and a properly prepped ceramic coating through years — cured under cover before the car goes back on the road.",
     pose: {
       position: [8.45, 2.2, 9.9],
-      target: [-2.7, -0.7, 5.25],
+      target: [-2.7, -0.7, 3.45],
       exposure: 1.3,
       finish: 1,
     },
@@ -122,7 +122,7 @@ const acts: CinemaAct[] = [
     body: `One vehicle holds the bay for the whole visit. Send the booking form with your car and a preferred day, and you'll get a personal reply ${BOOKING_RESPONSE_PROMISE}.`,
     pose: {
       position: [8.05, 7.15, 14.05],
-      target: [-2.4, -1.8, -0.4],
+      target: [-2.4, -2.2, -1.1],
       exposure: 1.89,
       finish: 1,
     },
