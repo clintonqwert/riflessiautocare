@@ -2,8 +2,8 @@
 
 ## Launch gate
 
-1. Have a lawyer review the legal pages and fill their `TODO(owner)` gaps (retention period, registered business name, cancellation terms, insurance). Decide whether to publish a phone number. Send one real submission per form from the live site and confirm both reach the inbox.
-   Done: domain live and contact email receiving (2026-09-28); pricing and the stats figures owner-confirmed, and 1.0.0 released (2026-09-29).
+1. Have a lawyer review the legal pages and fill their `TODO(owner)` gaps (retention period, registered business name, cancellation terms, insurance). Decide whether to publish a phone number.
+   Done: domain live and contact email receiving (2026-09-28); pricing and the stats figures owner-confirmed, and 1.0.0 released (2026-09-29); one real submission from each form confirmed in the inbox, and `v1.0.0` tagged (2026-10-06).
 2. Replace temporary stock imagery with the business's own photography before presenting the gallery as proof of work.
 
 ## Already in place

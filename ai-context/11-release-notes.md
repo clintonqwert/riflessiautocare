@@ -1,8 +1,20 @@
 # Riflessi release notes
 
-## 2026-09-29 — 1.0.0: first production release
+Each release is tagged `vX.Y.Z` on `main` and published as a GitHub release. Milestones are listed under the release that shipped them, newest first.
+
+## Unreleased
+
+### 2026-10-02 — Homepage car re-framed (#21)
+
+- Five of the seven acts in the homepage's scroll sequence are re-framed from the owner's own Stage Tuner session. The opening act now shows the whole front of the car instead of cropping the nose at the screen edge, and the reveal, finishes and invitation acts sit the car further into the right half, clear of the copy.
+- The camera path was checked against the car's real mesh: it never comes closer than 2.05 scene units.
+- Desktop only, since phones and reduced-motion never load the 3D stage. No change to content, routes, booking, or bundle size.
+
+## v1.0.0 — 2026-09-29
 
 Riflessi Auto Care is live at https://riflessiautocare.ca (`www` redirects to it).
+
+Tagged on 2026-10-06 at the merge of #20 (`d07bc5f`), once the owner confirmed that a real booking and a real question from the live site had both reached the inbox.
 
 **What's live**
 
@@ -25,16 +37,15 @@ Riflessi Auto Care is live at https://riflessiautocare.ca (`www` redirects to it
 
 - The legal pages are plain-language drafts awaiting a lawyer's review, with `TODO(owner)` gaps.
 - Imagery isn't settled. `/about` still shows stock frames of another bay and craftsman beside copy about this bay. The owner hasn't ruled on whether the showcase photos ("Il Portfolio" on the home page and `/gallery`) fit the outdoor-bay copy. `docs/maintenance/IMAGE-CREDITS.md` still lists all 12 credited images as stock, though some are now the owner's own.
-- One real submission from each form on the live site has to be confirmed in the inbox before the `v1.0.0` tag is cut.
 - No Content-Security-Policy, Lighthouse CI gate, or failed-booking alert yet (see the roadmap).
 - `/locations/[slug]` pages for the five cities are still to come.
 
-## 2026-07-30 — Continuous integration
+### 2026-07-30 — Continuous integration
 
 - Added `.github/workflows/ci.yml`: lint, typecheck, and build on every pull request and on `main`.
 - Closes the first item under "Engineering protection"; tests and the Lighthouse gate remain open.
 
-## 2026-07-30 — AI context baseline
+### 2026-07-30 — AI context baseline
 
 - Added project context, working rules, roadmap, and a Claude Code entrypoint grounded in the repository analysis.
 - No production behavior, public content, dependency, or deployment configuration changed.
