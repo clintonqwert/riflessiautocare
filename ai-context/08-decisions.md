@@ -1,5 +1,17 @@
 # Riflessi decision log
 
+## 2026-10-06 — Releases are tagged on `main`
+
+**Decision:** Cut numbered releases the same way as Driftpilot. Each release is an annotated `vX.Y.Z` tag on the merge commit of its release PR, with a GitHub release whose notes come from that version's section of `11-release-notes.md`. `package.json` carries the latest release's version. The first is `v1.0.0`, tagged on the merge of #20 (`d07bc5f`) once the owner confirmed on 2026-10-06 that one real submission from each form had reached the inbox.
+
+**Reason:** A tag gives each production state a name to point to in a rollback, a bug report or a conversation with the owner. Tagging the release PR's merge commit, not whatever `main` is at the time, keeps the tag on exactly the state the release notes describe. #21 merged before `v1.0.0` was tagged, so it is not part of that release.
+
+**Consequence:**
+
+- Versioning follows SemVer as it applies to a website: a patch for fixes, copy and docs; a minor for new capability, such as the `/locations` pages or a failed-booking alert; a major for a change of phase.
+- The version bump and its release notes go through a normal PR. The tag and the GitHub release are created only after the owner merges it.
+- Merged work that has not been released is listed under "Unreleased" in `11-release-notes.md` until the next release PR moves it under a version.
+
 ## 2026-09-29 — Release 1.0.0: launch content confirmed
 
 **Decision:** Tag the live site as 1.0.0. The owner confirmed every price in `src/lib/content/pricing.ts` and the "6h+" Signature Full Detail figure in `stats.ts` as real, so they are no longer placeholders.
